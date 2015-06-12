@@ -15,24 +15,33 @@
 //
 #include"red3.h"
 
-bool Uniform::setN(unsigned n)
+Uniform::Uniform(unsigned n, double L, bool lengthIsDelta)
 {
   m_n = n;
-  return true;
+  if(lengthIsDelta){
+    m_dx = L;
+    m_L = L*n;
+  } else {
+    m_L = L;
+    m_dx = L/(double)n;
+  }
 }
 
-bool Uniform::setL(double L)
+std::vector<double> Uniform::grid()
 {
-  m_L = L;
-  return true;
+  std::vector<double> g = {0.0};
+  for(unsigned i=1; i<m_n-2; i++) {
+    g.push_back(i*m_dx);
+  }
+  g.push_back(m_L);
+  return g;
 }
 
-double Uniform::x(unsigned i)
+std::vector<double> Uniform::midgrid()
 {
-  return 0;
-}
-
-double Uniform::xm(unsigned i)
-{
-  return 0;
+  std::vector<double> g;
+  for(unsigned i=1; i<m_n-1; i++) {
+    g.push_back((i-0.5)*m_dx);
+  }
+  return g;
 }

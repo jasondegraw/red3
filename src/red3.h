@@ -17,27 +17,31 @@
 #define RED3_H
 
 #include "red3api.h"
+#include <vector>
 
 class RED3_API Grid1D
 {
 public:
-  virtual bool setN(unsigned N) = 0;
-  virtual bool setL(double L) = 0;
-  virtual double x(unsigned i) = 0;
-  virtual double xm(unsigned i) = 0;
+  virtual std::vector<double> grid() = 0;
+  virtual std::vector<double> midgrid() = 0;
+  virtual double delta(unsigned i) = 0;
 };
 
 class RED3_API Uniform
 {
 public:
-  Uniform();
-  virtual bool setN(unsigned n);
-  virtual bool setL(double L);
-  virtual double x(unsigned i);
-  virtual double xm(unsigned i);
+  Uniform(unsigned n, double L, bool lengthIsDelta=false);
+  virtual std::vector<double> grid();
+  virtual std::vector<double> midgrid();
+  virtual double delta(unsigned)
+  {
+    return m_dx;
+  }
+
 private:
   double m_L;
   unsigned m_n;
+  double m_dx;
 };
 
 #endif
