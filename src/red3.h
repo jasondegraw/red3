@@ -18,6 +18,7 @@
 
 #include "red3api.h"
 #include <vector>
+#include <memory>
 
 class RED3_API Grid1D
 {
@@ -27,7 +28,7 @@ public:
   virtual double delta(unsigned i) = 0;
 };
 
-class RED3_API Uniform
+class RED3_API Uniform : public Grid1D
 {
 public:
   Uniform(unsigned n, double L, bool lengthIsDelta=false);
@@ -42,6 +43,12 @@ private:
   double m_L;
   unsigned m_n;
   double m_dx;
+};
+
+class RED3_API Grid2D
+{
+public:
+  Grid(std::unique_ptr<Grid1D> x, std::unique_ptr<Grid1D> y);
 };
 
 #endif
