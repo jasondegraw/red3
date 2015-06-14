@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(lib)
 
-#set(DEP_SRCS ../dependencies/jsoncpp/jsoncpp.cpp)
+set(DEP_SRCS ../dependencies/jsoncpp/jsoncpp.cpp)
+include_directories(../dependencies/jsoncpp)
 
 set(SRCS block.cpp
          geom.cpp

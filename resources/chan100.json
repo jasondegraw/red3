@@ -1,0 +1,9 @@
+{
+  "title" : "Laminar Channel Flow at Re=100",
+  "Re" : 100,
+  "x" : { "n" : 128,
+          "L" : 4 },
+  "y" : { "n" : 32,
+          "L" : 1 },
+  "F" : { "x" : 1 }
+}
