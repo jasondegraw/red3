@@ -17,5 +17,7 @@
 
 int main()
 {
+  // Set up the grid
+  // Initialize the velocity field
   return EXIT_SUCCESS;
 }

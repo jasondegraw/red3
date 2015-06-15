@@ -13,12 +13,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include "def.h"
 
-namespace user
+#include "red3api.h"
+
+namespace red3
 {
 
-double init(unsigned i, unsigned j, unsigned k, red3::CellFace face,
-            double x, double y, double z);
+class RED3_API StaggeredModel
+{
+private:
+  double m_dt;
+  double *x;
+  double *xm;
+  double *y;
+  double *ym;
+  double *z;
+  double *zm;
+  double *u;
+  double *v;
+  double *w;
+};
 
 }

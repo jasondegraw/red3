@@ -12,7 +12,9 @@ set(SRCS block.cpp
 
 set(HDRS red3api.h
          block.h
+         def.h
          geom.h
-         red3.h)
+         red3.h
+         staggeredmodel.h)
 
 add_library(red3_core SHARED ${HDRS} ${SRCS} ${DEP_SRCS})

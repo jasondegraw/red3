@@ -13,12 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include "def.h"
 
-namespace user
+namespace red3
 {
-
-double init(unsigned i, unsigned j, unsigned k, red3::CellFace face,
-            double x, double y, double z);
-
+enum class CellFace {North, South, East, West, Front, Back};
 }
