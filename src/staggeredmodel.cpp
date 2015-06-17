@@ -13,36 +13,37 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-
-#include "red3api.h"
+#include "util.h"
+#include "staggeredmodel.h"
 
 namespace red3
 {
 
-class RED3_API StaggeredModel
+StaggeredModel::StaggeredModel(unsigned nx, unsigned ny, unsigned nz)
 {
-public:
-  StaggeredModel(unsigned nx, unsigned ny, unsigned nz=1);
-private:
-  unsigned m_nx;
-  unsigned m_ny;
-  unsigned m_nz;
-  unsigned m_nu;
-  unsigned m_nv;
-  unsigned m_nw;
+  int i;
+  // Check the inputs
+  if(nx <= 1) {
+    fatal("nx must be greater than 1");
+  }
+  if(ny <= 1) {
+    fatal("ny must be greater than 1");
+  }
+  if(nz < 1) {
+    fatal("nz must be greater than 0");
+  }
 
-  double m_reynum;
-  double m_dt;
-  double *m_x;
-  double *m_xm;
-  double *m_y;
-  double *m_ym;
-  double *m_z;
-  double *m_zm;
-  double *m_u;
-  double *m_v;
-  double *m_w;
-  double *m_p;
-};
+  m_nx = nx;
+  m_ny = ny;
+  m_nz = nz;
+  m_nu = nx+1;
+  m_nv = ny+1;
+  m_nw = nz+1;
+  unsigned nuvw = nx+ny+2;
+  if(nz > 1) {
+    nuvw += nz+1;
+  }
+
+}
 
 }

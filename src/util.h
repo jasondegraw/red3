@@ -13,36 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
+#include <string>
 
-#include "red3api.h"
+namespace red3 {
 
-namespace red3
-{
-
-class RED3_API StaggeredModel
-{
-public:
-  StaggeredModel(unsigned nx, unsigned ny, unsigned nz=1);
-private:
-  unsigned m_nx;
-  unsigned m_ny;
-  unsigned m_nz;
-  unsigned m_nu;
-  unsigned m_nv;
-  unsigned m_nw;
-
-  double m_reynum;
-  double m_dt;
-  double *m_x;
-  double *m_xm;
-  double *m_y;
-  double *m_ym;
-  double *m_z;
-  double *m_zm;
-  double *m_u;
-  double *m_v;
-  double *m_w;
-  double *m_p;
-};
+void fatal(const std::string &mesg);
 
 }

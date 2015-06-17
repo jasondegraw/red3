@@ -8,13 +8,17 @@ include_directories(../dependencies/jsoncpp)
 set(SRCS block.cpp
          geom.cpp
          grid.cpp
-         main.cpp)
+         util.cpp
+         main.cpp
+         staggeredmodel.cpp
+         util.cpp)
 
 set(HDRS red3api.h
          block.h
          def.h
          geom.h
          red3.h
-         staggeredmodel.h)
+         staggeredmodel.h
+         util.h)
 
 add_library(red3_core SHARED ${HDRS} ${SRCS} ${DEP_SRCS})
