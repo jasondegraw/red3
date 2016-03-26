@@ -13,36 +13,44 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include "util.h"
-#include "staggeredmodel.h"
+#include "util.hpp"
+#include "staggeredmodel.hpp"
 
 namespace red3
 {
 
-StaggeredModel::StaggeredModel(unsigned nx, unsigned ny, unsigned nz)
+StaggeredGrid::StaggeredGrid(unsigned nnx, unsigned nny, unsigned nnz)
 {
   int i;
   // Check the inputs
-  if(nx <= 1) {
+  if(nnx <= 1) {
     fatal("nx must be greater than 1");
   }
-  if(ny <= 1) {
+  if(nny <= 1) {
     fatal("ny must be greater than 1");
   }
-  if(nz < 1) {
-    fatal("nz must be greater than 0");
-  }
 
-  m_nx = nx;
-  m_ny = ny;
-  m_nz = nz;
-  m_nu = nx+1;
-  m_nv = ny+1;
-  m_nw = nz+1;
+  nx = nnx;
+  ny = nny;
+  nz = nnz;
+  nu = nx+1;
+  nv = ny+1;
+  nw = nz+1;
+
   unsigned nuvw = nx+ny+2;
   if(nz > 1) {
-    nuvw += nz+1;
+    m_nu = nu*ny*nz;
+    m_nv = nx*nv*nz;
+    m_nw = nx*ny*nw;
+    m_w = (double*)calloc(m_nw, sizeof(double));
+  } else {
+    m_nu = nu*ny;
+    m_nv = nx*nv;
+    m_nw = 0;
+    m_w = nullptr;
   }
+  m_u = (double*)calloc(m_nu, sizeof(double));
+  m_v = (double*)calloc(m_nv, sizeof(double));
   //s->x = s->y = s->z = 0;
   // s->dx = s->dy = s->dz = 0;
   // s->dx = (real_t*)calloc(s->nx,sizeof(real_t));
@@ -78,6 +86,15 @@ StaggeredModel::StaggeredModel(unsigned nx, unsigned ny, unsigned nz)
   // /* if(s->xperi)s->ncell = (nx+1)*ny*nz; */
   // s->p = (real_t*)calloc(s->ncell,sizeof(real_t));
   // if(s->p == NULL)return 0;
+}
+
+StaggeredGrid::~StaggeredGrid()
+{
+  if(m_nw) {
+    free(m_w);
+  }
+  free(m_u);
+  free(m_v);
 }
 
 }

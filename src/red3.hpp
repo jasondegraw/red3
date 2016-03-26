@@ -1,4 +1,4 @@
-// Copyright (C) 2015  Jason W. DeGraw
+// Copyright (C) 2016 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,16 +16,18 @@
 #ifndef RED3_H
 #define RED3_H
 
-#include "red3api.h"
+#include "red3api.hpp"
 #include <vector>
 #include <memory>
 
 class RED3_API Grid1D
 {
 public:
+  virtual ~Grid1D(){}
   virtual std::vector<double> grid() = 0;
   virtual std::vector<double> midgrid() = 0;
   virtual double delta(unsigned i) = 0;
+  virtual unsigned n() = 0;
 };
 
 class RED3_API Uniform : public Grid1D
@@ -38,6 +40,10 @@ public:
   {
     return m_dx;
   }
+  virtual unsigned n()
+  {
+    return m_n;
+  }
 
 private:
   double m_L;
@@ -48,7 +54,7 @@ private:
 class RED3_API Grid2D
 {
 public:
-  Grid(std::unique_ptr<Grid1D> x, std::unique_ptr<Grid1D> y);
+  Grid2D(std::unique_ptr<Grid1D> x, std::unique_ptr<Grid1D> y);
 };
 
 #endif
