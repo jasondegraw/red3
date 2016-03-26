@@ -14,25 +14,25 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 #include "util.hpp"
-#include "staggeredmodel.hpp"
+#include "staggeredgrid.hpp"
 
 namespace red3
 {
 
-StaggeredGrid::StaggeredGrid(unsigned nnx, unsigned nny, unsigned nnz)
+StaggeredGrid::StaggeredGrid(unsigned nx, unsigned ny, unsigned nz)
 {
   int i;
   // Check the inputs
-  if(nnx <= 1) {
+  if(nx <= 1) {
     fatal("nx must be greater than 1");
   }
-  if(nny <= 1) {
+  if(ny <= 1) {
     fatal("ny must be greater than 1");
   }
 
-  nx = nnx;
-  ny = nny;
-  nz = nnz;
+  this->nx = nx;
+  this->ny = ny;
+  this->nz = nz;
   nu = nx+1;
   nv = ny+1;
   nw = nz+1;

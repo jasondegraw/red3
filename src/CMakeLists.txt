@@ -10,7 +10,7 @@ set(SRCS block.cpp
          grid.cpp
          util.cpp
          main.cpp
-         staggeredmodel.cpp
+         staggeredgrid.cpp
          util.cpp)
 
 set(HDRS red3api.hpp
@@ -19,7 +19,7 @@ set(HDRS red3api.hpp
          def.hpp
          geom.hpp
          red3.hpp
-         staggeredmodel.hpp
+         staggeredgrid.hpp
          util.hpp)
 
 add_library(red3_core SHARED ${HDRS} ${SRCS} ${DEP_SRCS})
