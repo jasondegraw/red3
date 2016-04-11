@@ -13,10 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
+#ifndef STAGGEREDGRID_HPP
+#define STAGGEREDGRID_HPP
 #include <vector>
+#include <functional>
 
 #include "red3api.hpp"
 #include "arrayops.hpp"
+#include "array.hpp"
 
 namespace red3
 {
@@ -27,10 +31,23 @@ public:
   StaggeredGrid(unsigned nnx, unsigned nny, unsigned nnz=1);
   virtual ~StaggeredGrid();
 
-  double u(size_t i, size_t j, size_t k) { return m_u[i]; }
-  double v(size_t i, size_t j, size_t k) { return m_v[i]; }
-  double w(size_t i, size_t j, size_t k) { return m_w[i]; }
-  double p(size_t i, size_t j, size_t k) { return m_p[i]; }
+  double u(size_t i, size_t j, size_t k) { return m_u[INDEX(i,j,k,nu,ny,nz)]; }
+  double v(size_t i, size_t j, size_t k) { return m_v[INDEX(j,i,k,nv,nx,nz)]; }
+  double w(size_t i, size_t j, size_t k) { return m_w[INDEX(k,j,i,nw,ny,nx)]; }
+  double p(size_t i, size_t j, size_t k) { return m_p[INDEX(i,j,k,nx,ny,nz)]; }
+  Array<StaggeredGrid> divg();
+
+  //void setU(std::function<double(double, double)> f);
+  void setU(double(*f)(double x, double y));
+  void setV(double(*f)(double x, double y));
+
+  //void setU(std::function<double(double, double, double)> f);
+  void setU(double(*f)(double x, double y, double z));
+  void setV(double(*f)(double x, double y, double z));
+  void setW(double(*f)(double x, double y, double z));
+
+  double *allocateVariable();
+  void divg(double *g);
 
   //double x(size_t i, size_t j, size_t k) { return m_u[i]; }
   //double y(size_t i, size_t j, size_t k) { return m_u[i]; }
@@ -66,19 +83,23 @@ protected:
 
   double m_reynum;
   double m_dt;
-//  double *m_x;
-//  double *m_xm;
-//  double *m_y;
-//  double *m_ym;
-//  double *m_z;
-//  double *m_zm;
+
+  std::vector<double> m_x;
+  std::vector<double> m_xm;
+  std::vector<double> m_y;
+  std::vector<double> m_ym;
+  std::vector<double> m_z;
+  std::vector<double> m_zm;
+
   double *m_u;
   double *m_v;
   double *m_w;
   double *m_p;
 
-private:
-  bool allocateSolution();
+//private:
+//  bool allocateSolution();
 };
 
 }
+
+#endif

@@ -1,4 +1,4 @@
-// Copyright (C) 2015  Jason W. DeGraw
+// Copyright (C) 2015-2015 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,6 +15,8 @@
 //
 #include "util.hpp"
 #include "staggeredgrid.hpp"
+#include "grid.hpp"
+#include "arrayops.hpp"
 
 namespace red3
 {
@@ -35,22 +37,61 @@ StaggeredGrid::StaggeredGrid(unsigned nx, unsigned ny, unsigned nz)
   this->nz = nz;
   nu = nx+1;
   nv = ny+1;
-  nw = nz+1;
+  if(nz == 1) {
+    nw = 0;
+  } else {
+    nw = nz + 1;
+  }
+
+  m_ncells = nx*ny*nz;
 
   unsigned nuvw = nx+ny+2;
   if(nz > 1) {
     m_nu = nu*ny*nz;
     m_nv = nx*nv*nz;
     m_nw = nx*ny*nw;
-    m_w = (double*)calloc(m_nw, sizeof(double));
+    m_w = (double*)callocate(m_nw, sizeof(double), "w velocity");
+    //m_z = (double*)callocate(nw, sizeof(double), "z grid");
+    //m_zm = (double*)callocate(nz, sizeof(double), "z mid-grid");
   } else {
     m_nu = nu*ny;
     m_nv = nx*nv;
     m_nw = 0;
     m_w = nullptr;
+    //m_z = nullptr;
+    //m_zm = nullptr;
   }
-  m_u = (double*)calloc(m_nu, sizeof(double));
-  m_v = (double*)calloc(m_nv, sizeof(double));
+  m_u = (double*)callocate(m_nu, sizeof(double), "u velocity");
+  m_v = (double*)callocate(m_nv, sizeof(double), "v velocity");
+  //m_x = (double*)callocate(nu, sizeof(double), "x grid");
+  //m_y = (double*)callocate(nv, sizeof(double), "y grid");
+  //m_xm = (double*)callocate(nx, sizeof(double), "x mid-grid");
+  //m_ym = (double*)callocate(ny, sizeof(double), "y mid-grid");
+  m_p = (double*)callocate(m_ncells, sizeof(double), "pressure");
+
+  // Make a simple grid
+  Uniform xg(nu);
+  x = xg.grid();
+  xm = xg.midgrid();
+  Uniform yg(nv);
+  y = yg.grid();
+  ym = yg.midgrid();
+  if(nw){
+    Uniform zg(nv);
+    z = zg.grid();
+    zm = zg.midgrid();
+  }
+  /*
+  double dx = 1.0 / (double)nx;
+  x.push_back(0.0);
+  for(unsigned i = 0; i < nx - 1; i++){
+    x.push_back(x[i] + dx);
+    xm.push_back(x[i] + 0.5*dx);
+  }
+  x.push_back(1.0);
+  xm.push_back(1.0 - 0.5*dx);
+  */
+
   //s->x = s->y = s->z = 0;
   // s->dx = s->dy = s->dz = 0;
   // s->dx = (real_t*)calloc(s->nx,sizeof(real_t));
@@ -95,6 +136,70 @@ StaggeredGrid::~StaggeredGrid()
   }
   free(m_u);
   free(m_v);
+  free(m_p);
+}
+
+//void StaggeredGrid::setU(std::function<double(double, double)> f)
+void StaggeredGrid::setU(double(*f)(double x, double y))
+{
+  for(unsigned k = 0; k < nz; k++) {
+    for(unsigned j = 0; j < ny; j++) {
+      double yy = ym[j];
+      for(unsigned i = 0; i < nu; i++) {
+        m_u[UINDEX(i, j, 0, nu, ny, nz)] = f(x[i], yy);
+      }
+    }
+  }
+}
+
+void StaggeredGrid::setV(double(*f)(double x, double y))
+{
+  for(unsigned k = 0; k < nz; k++) {
+    for(unsigned i = 0; i < nx; i++) {
+      double xx = xm[i];
+      for(unsigned j = 0; j < nv; j++) {
+        m_u[UINDEX(i, j, k, nu, ny, nz)] = f(xx, y[i]);
+      }
+    }
+  }
+}
+
+//void StaggeredGrid::setU(std::function<double(double, double, double)> f)
+void StaggeredGrid::setU(double(*f)(double x, double y, double z))
+{
+  if(nw) {
+    for(unsigned k = 0; k < nz; k++) {
+      double zz = 0.0;
+      for(unsigned j = 0; j < ny; j++) {
+        double yy = 0.5*(y[j] + y[j + 1]);
+        for(unsigned i = 0; i < nu; i++) {
+          m_u[UINDEX(i, j, k, nu, ny, nz)] = f(x[i], yy, zz);
+        }
+      }
+    }
+  } else {
+    for(unsigned j = 0; j < ny; j++) {
+      double yy = 0.5*(y[j] + y[j+1]);
+      for(unsigned i = 0; i < nu; i++) {
+        m_u[UINDEX(i, j, 0, nu, ny, nz)] = f(x[i], yy, 0.0);
+      }
+    }
+  }
+}
+
+void StaggeredGrid::setV(double(*f)(double x, double y, double z))
+{
+
+}
+
+void StaggeredGrid::setW(double(*f)(double x, double y, double z))
+{
+
+}
+
+double *StaggeredGrid::allocateVariable()
+{
+  return (double*)callocate(m_ncells, sizeof(double), "cell-centered variable");
 }
 
 }

@@ -13,24 +13,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include "util.hpp"
-#include <stdexcept>
-#include <stdlib.h>
+#include "array.hpp"
 
 namespace red3 {
-
-void fatal(const std::string &mesg)
+/*
+Array::Array(StaggeredGrid *parent) : m_parent(parent)
 {
-  throw std::runtime_error("red3: " + mesg);
+  m_impl = std::shared_ptr<double>(new double[m_parent->nx*m_parent->ny*m_parent->nz], std::default_delete<double[]>());
 }
 
-void* callocate(size_t num, size_t size, const std::string &name)
+Array::Array(const Array &other) : m_impl(other.m_impl), m_parent(other.m_parent)
+{}
+
+Array& Array::operator=(const Array &other)
 {
-  void* v = calloc(num, size);
-  if(v == 0) {
-    fatal("Failed to allocate " + name);
-  }
-  return v;
+  m_impl = other.m_impl;
+  return *this;
 }
+
+bool Array::operator==(const Array &other) const
+{
+  return m_impl == other.m_impl;
+}
+
+bool Array::operator!=(const Array &other) const
+{
+  return m_impl != other.m_impl;
+}
+*/
 
 }

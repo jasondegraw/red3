@@ -18,5 +18,6 @@
 namespace red3 {
 
 void fatal(const std::string &mesg);
+void* callocate(size_t num, size_t size, const std::string &name);
 
 }

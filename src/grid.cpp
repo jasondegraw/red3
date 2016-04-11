@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include"red3.hpp"
+#include"grid.hpp"
 
 Uniform::Uniform(unsigned n, double L, bool lengthIsDelta)
 {
@@ -23,14 +23,14 @@ Uniform::Uniform(unsigned n, double L, bool lengthIsDelta)
     m_L = L*n;
   } else {
     m_L = L;
-    m_dx = L/(double)n;
+    m_dx = L/(double)(n-1);
   }
 }
 
 std::vector<double> Uniform::grid()
 {
   std::vector<double> g = {0.0};
-  for(unsigned i=1; i<m_n-2; i++) {
+  for(unsigned i=1; i<m_n-1; i++) {
     g.push_back(i*m_dx);
   }
   g.push_back(m_L);
@@ -40,7 +40,7 @@ std::vector<double> Uniform::grid()
 std::vector<double> Uniform::midgrid()
 {
   std::vector<double> g;
-  for(unsigned i=1; i<m_n-1; i++) {
+  for(unsigned i=1; i<m_n; i++) {
     g.push_back((i-0.5)*m_dx);
   }
   return g;

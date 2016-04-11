@@ -13,24 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include "util.hpp"
-#include <stdexcept>
 #include <stdlib.h>
 
-namespace red3 {
-
-void fatal(const std::string &mesg)
+int main(int argc, char *argv[])
 {
-  throw std::runtime_error("red3: " + mesg);
-}
-
-void* callocate(size_t num, size_t size, const std::string &name)
-{
-  void* v = calloc(num, size);
-  if(v == 0) {
-    fatal("Failed to allocate " + name);
-  }
-  return v;
-}
-
+  return EXIT_SUCCESS;
 }
