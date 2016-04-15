@@ -35,7 +35,8 @@ public:
   double v(size_t i, size_t j, size_t k) { return m_v[INDEX(j,i,k,nv,nx,nz)]; }
   double w(size_t i, size_t j, size_t k) { return m_w[INDEX(k,j,i,nw,ny,nx)]; }
   double p(size_t i, size_t j, size_t k) { return m_p[INDEX(i,j,k,nx,ny,nz)]; }
-  Array<StaggeredGrid> divg();
+  void divg(Array<StaggeredGrid> &g);
+  void dudx(Array<StaggeredGrid> &g);
 
   //void setU(std::function<double(double, double)> f);
   void setU(double(*f)(double x, double y));
@@ -57,17 +58,20 @@ public:
   //double ym(size_t i, size_t j, size_t k) { return m_ym[i]; }
   //double zm(size_t i, size_t j, size_t k) { return m_zm[i]; }
 
-  unsigned nx;
-  unsigned ny;
-  unsigned nz;
+  const unsigned nx;
+  const unsigned ny;
+  const unsigned nz;
 
-  unsigned nu;
-  unsigned nv;
-  unsigned nw;
+  const unsigned nu;
+  const unsigned nv;
+  const unsigned nw;
 
   std::vector<double> x;
+  std::vector<double> dx;
   std::vector<double> y;
+  std::vector<double> dy;
   std::vector<double> z;
+  std::vector<double> dz;
   std::vector<double> xm;
   std::vector<double> ym;
   std::vector<double> zm;

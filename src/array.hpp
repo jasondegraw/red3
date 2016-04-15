@@ -79,7 +79,7 @@ public:
     return m_impl != other.m_impl;
   }
 
-  double &operator[](unsigned i)
+  inline double &operator[](unsigned i)
   {
     return (m_impl.get())[i];
   }

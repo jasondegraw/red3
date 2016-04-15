@@ -21,7 +21,7 @@
 namespace red3
 {
 
-StaggeredGrid::StaggeredGrid(unsigned nx, unsigned ny, unsigned nz)
+StaggeredGrid::StaggeredGrid(unsigned ni, unsigned nj, unsigned nk) : nx(ni), ny(nj), nz(nk), nu(ni + 1), nv(nj + 1), nw(nk==1 ? 0 : nk+1)
 {
   int i;
   // Check the inputs
@@ -30,17 +30,6 @@ StaggeredGrid::StaggeredGrid(unsigned nx, unsigned ny, unsigned nz)
   }
   if(ny <= 1) {
     fatal("ny must be greater than 1");
-  }
-
-  this->nx = nx;
-  this->ny = ny;
-  this->nz = nz;
-  nu = nx+1;
-  nv = ny+1;
-  if(nz == 1) {
-    nw = 0;
-  } else {
-    nw = nz + 1;
   }
 
   m_ncells = nx*ny*nz;
@@ -200,6 +189,40 @@ void StaggeredGrid::setW(double(*f)(double x, double y, double z))
 double *StaggeredGrid::allocateVariable()
 {
   return (double*)callocate(m_ncells, sizeof(double), "cell-centered variable");
+}
+
+void StaggeredGrid::divg(Array<StaggeredGrid> &g)
+{
+  //Array<StaggeredGrid> g(this);
+  unsigned i0 = 0, i1 = 0;
+  for(unsigned k = 0; k < nz; k++) {
+    for(unsigned j = 0; j < ny; j++) {
+      for(unsigned i = 0; i < nx; i++) { 
+        g[i0] = (m_u[i1 + 1] - m_u[i1]) / dx[i];
+        i0++;
+        i1++;
+      }
+      i1++;
+    }
+  }
+  //return g;
+}
+
+void StaggeredGrid::dudx(Array<StaggeredGrid> &g)
+{
+  //Array<StaggeredGrid> g(this);
+  unsigned i0 = 0, i1 = 0;
+  for(unsigned k = 0; k < nz; k++) {
+    for(unsigned j = 0; j < ny; j++) {
+      for(unsigned i = 0; i < nx; i++) {
+        g[i0] = (m_u[i1 + 1] - m_u[i1]) / dx[i];
+        i0++;
+        i1++;
+      }
+      i1++;
+    }
+  }
+  //return g;
 }
 
 }
