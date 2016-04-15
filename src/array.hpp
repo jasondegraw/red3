@@ -86,7 +86,7 @@ public:
 
   inline double &operator()(unsigned i, unsigned j, unsigned k)
   {
-    return (m_impl.get())[INDEX(i, j, k, m_parent->nx, m_parent->ny, m_parent->nz)];
+    return (m_impl.get())[INDEX(i, j, k, m_parent->ni, m_parent->nj, m_parent->nk)];
   }
 
 protected:

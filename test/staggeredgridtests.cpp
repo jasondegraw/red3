@@ -21,11 +21,11 @@
 TEST(StaggerdGridTests, Basic2D)
 {
   red3::StaggeredGrid grid(4, 5);
-  EXPECT_EQ(4, grid.nx);
+  EXPECT_EQ(4, grid.ni);
   EXPECT_EQ(5, grid.nu);
-  EXPECT_EQ(5, grid.ny);
+  EXPECT_EQ(5, grid.nj);
   EXPECT_EQ(6, grid.nv);
-  EXPECT_EQ(1, grid.nz);
+  EXPECT_EQ(1, grid.nk);
   EXPECT_EQ(0, grid.nw);
   // Check grid
   ASSERT_EQ(5, grid.x.size());
@@ -35,7 +35,7 @@ TEST(StaggerdGridTests, Basic2D)
   }
   ASSERT_EQ(4, grid.xm.size());
   std::vector<double> xm = { 0.125, 0.375, 0.625, 0.875 };
-  for(unsigned i = 0; i < grid.nx; i++) {
+  for(unsigned i = 0; i < grid.ni; i++) {
     EXPECT_DOUBLE_EQ(xm[i], grid.xm[i]);
   }
   ASSERT_EQ(6, grid.y.size());
@@ -45,12 +45,12 @@ TEST(StaggerdGridTests, Basic2D)
   }
   ASSERT_EQ(5, grid.ym.size());
   std::vector<double> ym = { 0.1, 0.3, 0.5, 0.7, 0.9 };
-  for(unsigned i = 0; i < grid.ny; i++) {
+  for(unsigned i = 0; i < grid.ni; i++) {
     EXPECT_DOUBLE_EQ(ym[i], grid.ym[i]);
   }
   // Check velocity
   grid.setU([](double x, double y){return x;});
-  for(unsigned j = 0; j < grid.ny; j++) {
+  for(unsigned j = 0; j < grid.nj; j++) {
     for(unsigned i = 0; i < grid.nu; i++) {
       EXPECT_EQ(x[i], grid.u(i, j, 0));
     }

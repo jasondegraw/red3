@@ -21,30 +21,30 @@
 namespace red3
 {
 
-StaggeredGrid::StaggeredGrid(unsigned ni, unsigned nj, unsigned nk) : nx(ni), ny(nj), nz(nk), nu(ni + 1), nv(nj + 1), nw(nk==1 ? 0 : nk+1)
+StaggeredGrid::StaggeredGrid(unsigned ni, unsigned nj, unsigned nk) : ni(ni), nj(nj), nk(nk), nu(ni + 1), nv(nj + 1), nw(nk==1 ? 0 : nk+1)
 {
   int i;
   // Check the inputs
-  if(nx <= 1) {
-    fatal("nx must be greater than 1");
+  if(ni <= 1) {
+    fatal("ni must be greater than 1");
   }
-  if(ny <= 1) {
-    fatal("ny must be greater than 1");
+  if(nj <= 1) {
+    fatal("nj must be greater than 1");
   }
 
-  m_ncells = nx*ny*nz;
+  m_ncells = ni*nj*nk;
 
-  unsigned nuvw = nx+ny+2;
-  if(nz > 1) {
-    m_nu = nu*ny*nz;
-    m_nv = nx*nv*nz;
-    m_nw = nx*ny*nw;
+  unsigned nuvw = ni+nj+2;
+  if(nk > 1) {
+    m_nu = nu*nj*nk;
+    m_nv = ni*nv*nk;
+    m_nw = ni*nj*nw;
     m_w = (double*)callocate(m_nw, sizeof(double), "w velocity");
     //m_z = (double*)callocate(nw, sizeof(double), "z grid");
     //m_zm = (double*)callocate(nz, sizeof(double), "z mid-grid");
   } else {
-    m_nu = nu*ny;
-    m_nv = nx*nv;
+    m_nu = nu*nj;
+    m_nv = ni*nv;
     m_nw = 0;
     m_w = nullptr;
     //m_z = nullptr;
@@ -131,11 +131,11 @@ StaggeredGrid::~StaggeredGrid()
 //void StaggeredGrid::setU(std::function<double(double, double)> f)
 void StaggeredGrid::setU(double(*f)(double x, double y))
 {
-  for(unsigned k = 0; k < nz; k++) {
-    for(unsigned j = 0; j < ny; j++) {
+  for(unsigned k = 0; k < nk; k++) {
+    for(unsigned j = 0; j < nj; j++) {
       double yy = ym[j];
       for(unsigned i = 0; i < nu; i++) {
-        m_u[UINDEX(i, j, 0, nu, ny, nz)] = f(x[i], yy);
+        m_u[UINDEX(i, j, 0, nu, nj, nk)] = f(x[i], yy);
       }
     }
   }
@@ -143,11 +143,11 @@ void StaggeredGrid::setU(double(*f)(double x, double y))
 
 void StaggeredGrid::setV(double(*f)(double x, double y))
 {
-  for(unsigned k = 0; k < nz; k++) {
-    for(unsigned i = 0; i < nx; i++) {
+  for(unsigned k = 0; k < nk; k++) {
+    for(unsigned i = 0; i < ni; i++) {
       double xx = xm[i];
       for(unsigned j = 0; j < nv; j++) {
-        m_u[UINDEX(i, j, k, nu, ny, nz)] = f(xx, y[i]);
+        //m_u[UINDEX(i, j, k, nu, ny, nz)] = f(xx, y[i]);
       }
     }
   }
@@ -157,20 +157,20 @@ void StaggeredGrid::setV(double(*f)(double x, double y))
 void StaggeredGrid::setU(double(*f)(double x, double y, double z))
 {
   if(nw) {
-    for(unsigned k = 0; k < nz; k++) {
+    for(unsigned k = 0; k < nk; k++) {
       double zz = 0.0;
-      for(unsigned j = 0; j < ny; j++) {
+      for(unsigned j = 0; j < nj; j++) {
         double yy = 0.5*(y[j] + y[j + 1]);
         for(unsigned i = 0; i < nu; i++) {
-          m_u[UINDEX(i, j, k, nu, ny, nz)] = f(x[i], yy, zz);
+          m_u[UINDEX(i, j, k, nu, nj, nk)] = f(x[i], yy, zz);
         }
       }
     }
   } else {
-    for(unsigned j = 0; j < ny; j++) {
+    for(unsigned j = 0; j < nj; j++) {
       double yy = 0.5*(y[j] + y[j+1]);
       for(unsigned i = 0; i < nu; i++) {
-        m_u[UINDEX(i, j, 0, nu, ny, nz)] = f(x[i], yy, 0.0);
+        m_u[UINDEX(i, j, 0, nu, nj, nk)] = f(x[i], yy, 0.0);
       }
     }
   }
@@ -195,9 +195,9 @@ void StaggeredGrid::divg(Array<StaggeredGrid> &g)
 {
   //Array<StaggeredGrid> g(this);
   unsigned i0 = 0, i1 = 0;
-  for(unsigned k = 0; k < nz; k++) {
-    for(unsigned j = 0; j < ny; j++) {
-      for(unsigned i = 0; i < nx; i++) { 
+  for(unsigned k = 0; k < ni; k++) {
+    for(unsigned j = 0; j < nj; j++) {
+      for(unsigned i = 0; i < ni; i++) { 
         g[i0] = (m_u[i1 + 1] - m_u[i1]) / dx[i];
         i0++;
         i1++;
@@ -212,9 +212,9 @@ void StaggeredGrid::dudx(Array<StaggeredGrid> &g)
 {
   //Array<StaggeredGrid> g(this);
   unsigned i0 = 0, i1 = 0;
-  for(unsigned k = 0; k < nz; k++) {
-    for(unsigned j = 0; j < ny; j++) {
-      for(unsigned i = 0; i < nx; i++) {
+  for(unsigned k = 0; k < ni; k++) {
+    for(unsigned j = 0; j < nj; j++) {
+      for(unsigned i = 0; i < ni; i++) {
         g[i0] = (m_u[i1 + 1] - m_u[i1]) / dx[i];
         i0++;
         i1++;
