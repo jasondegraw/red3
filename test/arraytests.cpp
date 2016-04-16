@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2015 Jason W. DeGraw
+// Copyright (C) 2015-2016 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,15 +17,13 @@
 #include "staggeredgrid.hpp"
 #include "array.hpp"
 #include "gtest/gtest.h"
-#include <iostream>
 
 TEST(ArrayTests, Basic2D)
 {
-  /*
   red3::StaggeredGrid grid(4, 5);
-  red3::Array array(&grid);
-  for(unsigned j = 0; j < grid.ny; j++) {
-    for(unsigned i = 0; i < grid.nx; i++) {
+  red3::Array<red3::StaggeredGrid> array(&grid);
+  for(unsigned j = 0; j < grid.nj; j++) {
+    for(unsigned i = 0; i < grid.ni; i++) {
       array(i, j, 0) = i;
     }
   }
@@ -33,7 +31,6 @@ TEST(ArrayTests, Basic2D)
     0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0,
     0.0, 1.0, 2.0, 3.0 };
   for(unsigned i = 0; i < 20; i++) {
-    //std::cout << array[i] << std::endl;
     EXPECT_EQ(v[i], array[i]);
     array[i] = (double)i;
   }
@@ -42,6 +39,5 @@ TEST(ArrayTests, Basic2D)
     EXPECT_EQ(value, array[i]);
     value += 1.0;
   }
-  */
 }
 

@@ -59,7 +59,7 @@ public:
   {}
   Array(T *parent) : m_parent(parent)
   {
-    m_impl = std::shared_ptr<double>(new double[m_parent->nx*m_parent->ny*m_parent->nz], std::default_delete<double[]>());
+    m_impl = std::shared_ptr<double>(new double[m_parent->ni*m_parent->nj*m_parent->nk], std::default_delete<double[]>());
   }
   Array(const Array &other) : m_impl(other.m_impl), m_parent(other.m_parent)
   {}

@@ -6,20 +6,15 @@ set(DEP_SRCS ../dependencies/jsoncpp/jsoncpp.cpp)
 include_directories(../dependencies/jsoncpp)
 
 set(SRCS array.cpp
-         block.cpp
-         geom.cpp
          grid.cpp
          util.cpp
-         main.cpp
          staggeredgrid.cpp
          util.cpp)
 
 set(HDRS red3api.hpp
          array.hpp
          arrayops.hpp
-         block.hpp
          def.hpp
-         geom.hpp
          grid.hpp
          red3.hpp
          staggeredgrid.hpp
