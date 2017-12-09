@@ -17,58 +17,76 @@
 #include "staggeredgrid.hpp"
 #include "grid.hpp"
 #include "arrayops.hpp"
+#include <iostream>
 
 namespace red3
 {
 
-StaggeredGrid::StaggeredGrid(unsigned ni, unsigned nj, unsigned nk) : ni(ni), nj(nj), nk(nk), nu(ni + 1), nv(nj + 1), nw(nk==1 ? 0 : nk+1)
+StaggeredGrid::StaggeredGrid(int ni, int nj, int nk, bool xperi)
+  : ni(ni), nj(nj), nk(nk), nu(ni + 1), nv(nj + 1), nw(nk == 1 ? 0 : nk + 1), xperi(xperi)
 {
-  int i;
   // Check the inputs
-  if(ni <= 1) {
+  if(ni < 2) {
     fatal("ni must be greater than 1");
   }
-  if(nj <= 1) {
+  if(nj < 2) {
     fatal("nj must be greater than 1");
   }
 
   m_ncells = ni*nj*nk;
 
-  unsigned nuvw = ni+nj+2;
+  int nuvw = ni+nj+2;
   if(nk > 1) {
     m_nu = nu*nj*nk;
     m_nv = ni*nv*nk;
     m_nw = ni*nj*nw;
-    m_w = (double*)callocate(m_nw, sizeof(double), "w velocity");
+    m_w = std::make_unique<double[]>(m_nw);
+    //m_w = (double*)callocate(m_nw, sizeof(double), "w velocity");
     //m_z = (double*)callocate(nw, sizeof(double), "z grid");
     //m_zm = (double*)callocate(nz, sizeof(double), "z mid-grid");
   } else {
     m_nu = nu*nj;
     m_nv = ni*nv;
     m_nw = 0;
-    m_w = nullptr;
+    //m_w = nullptr;
     //m_z = nullptr;
     //m_zm = nullptr;
   }
-  m_u = (double*)callocate(m_nu, sizeof(double), "u velocity");
-  m_v = (double*)callocate(m_nv, sizeof(double), "v velocity");
+  m_u = std::make_unique<double[]>(m_nu); // (double*)callocate(m_nu, sizeof(double), "u velocity");
+  m_u_n = (double*)callocate(ni*nk, sizeof(double), "north u velocity");
+  m_u_s = (double*)callocate(ni*nk, sizeof(double), "south u velocity");
+  m_v = std::make_unique<double[]>(m_nv); //(double*)callocate(m_nv, sizeof(double), "v velocity");
   //m_x = (double*)callocate(nu, sizeof(double), "x grid");
   //m_y = (double*)callocate(nv, sizeof(double), "y grid");
   //m_xm = (double*)callocate(nx, sizeof(double), "x mid-grid");
   //m_ym = (double*)callocate(ny, sizeof(double), "y mid-grid");
-  m_p = (double*)callocate(m_ncells, sizeof(double), "pressure");
+  m_p = std::make_unique<double[]>(m_ncells); //(double*)callocate(m_ncells, sizeof(double), "pressure");
 
   // Make a simple grid
   Uniform xg(nu);
   x = xg.grid();
   xm = xg.midgrid();
+  dx = xg.deltas();
+  double rdx = 1.0 / xg.delta0();
+  m_rdx = std::vector<double>(xg.n(), rdx);
   Uniform yg(nv);
   y = yg.grid();
   ym = yg.midgrid();
-  if(nw){
+  dy = yg.deltas();
+  double rdy = 1.0 / yg.delta0();
+  m_rdy = std::vector<double>(yg.n(), rdy);
+  if(nw) {
     Uniform zg(nv);
     z = zg.grid();
     zm = zg.midgrid();
+    dz = zg.deltas();
+    double rdz = 1.0 / zg.delta0();
+    m_rdz = std::vector<double>(zg.n(), rdz);
+  } else {
+    z = { -0.5, 0.5 };
+    zm = { 0.0 };
+    dz = { 1.0 };
+    m_rdz = { 1.0 };
   }
   /*
   double dx = 1.0 / (double)nx;
@@ -118,23 +136,148 @@ StaggeredGrid::StaggeredGrid(unsigned ni, unsigned nj, unsigned nk) : ni(ni), nj
   // if(s->p == NULL)return 0;
 }
 
-StaggeredGrid::~StaggeredGrid()
+double *StaggeredGrid::allocateVariable()
 {
-  if(m_nw) {
-    free(m_w);
+  return (double*)callocate(m_ncells, sizeof(double), "cell-centered variable");
+}
+
+void StaggeredGrid::divg(Array<StaggeredGrid> &g)
+{
+  int i0 = 0, i1 = 0, j0 = 0, j1 = 0;
+  for(int k = 0; k < nk; k++) {
+    for(int j = 0; j < nj; j++) {
+      for(int i = 0; i < ni; i++) { 
+        g[i0] = (m_u[i1 + 1] - m_u[i1]) / (x[i + 1] - x[i]);
+        i0++;
+        i1++;
+      }
+      i1++;
+    }
   }
-  free(m_u);
-  free(m_v);
-  free(m_p);
+  for(int k = 0; k < nk; k++) {
+    for(int i = 0; i < ni; i++) {
+      for(int j = 0; j < nj; j++) {
+        g[j0] += (m_v[j1 + 1] - m_v[j1]) / (y[j + 1] - y[j]);
+        j0++;
+        j1++;
+      }
+      j1++;
+    }
+  }
+  if(nw) {
+    int k0 = 0, k1 = 0;
+    for(int j = 0; j < nj; j++) {
+      for(int i = 0; i < ni; i++) {
+        for(int k = 0; k < nk; k++) {
+          g[k0] += (m_w[k1 + 1] - m_w[k1]) / (z[k + 1] - z[k]);
+          k0++;
+          k1++;
+        }
+        k1++;
+      }
+    }
+  }
+}
+
+void StaggeredGrid::divg(ArrayU<StaggeredGrid> &u, ArrayV<StaggeredGrid> &v, Array<StaggeredGrid> &g)
+{
+  int i0 = 0, i1 = 0, j0 = 0, j1 = 0;
+  for(int j = 0; j < nj; j++) {
+    for(int i = 0; i < ni; i++) {
+      g[i0] = (u[i1 + 1] - u[i1]) / (x[i + 1] - x[i]);
+      i0++;
+      i1++;
+    }
+    i1++;
+  }
+  for(int i = 0; i < ni; i++) {
+    for(int j = 0; j < nj; j++) {
+      g[j0] += (v[j1 + 1] - v[j1]) / (y[j + 1] - y[j]);
+      j0++;
+      j1++;
+    }
+    j1++;
+  }
+
+}
+
+
+void StaggeredGrid::divg(ArrayU<StaggeredGrid> &u, ArrayV<StaggeredGrid> &v, ArrayW<StaggeredGrid> &w, Array<StaggeredGrid> &g)
+{
+  int i0 = 0, i1 = 0, j0 = 0, j1 = 0;
+  for(int k = 0; k < nk; k++) {
+    for(int j = 0; j < nj; j++) {
+      for(int i = 0; i < ni; i++) {
+        g[i0] = (u[i1 + 1] - u[i1]) / (x[i + 1] - x[i]);
+        i0++;
+        i1++;
+      }
+      i1++;
+    }
+  }
+  for(int k = 0; k < nk; k++) {
+    for(int i = 0; i < ni; i++) {
+      for(int j = 0; j < nj; j++) {
+        g[j0] += (v[j1 + 1] - v[j1]) / (y[j + 1] - y[j]);
+        j0++;
+        j1++;
+      }
+      j1++;
+    }
+  }
+  if(nw) {
+    int k0 = 0, k1 = 0;
+    for(int j = 0; j < nj; j++) {
+      for(int i = 0; i < ni; i++) {
+        for(int k = 0; k < nk; k++) {
+          g[k0] += (w[k1 + 1] - w[k1]) / (z[k + 1] - z[k]);
+          k0++;
+          k1++;
+        }
+        k1++;
+      }
+    }
+  }
+}
+
+void StaggeredGrid::dudx(Array<StaggeredGrid> &g)
+{
+  int i0 = 0, i1 = 0;
+  for(int k = 0; k < nk; k++) {
+    for(int j = 0; j < nj; j++) {
+      for(int i = 0; i < ni; i++) {
+        //std::cout << i << " " << j << " " << i0 << " " << i1 << std::endl;
+        g[i0] = (m_u[i1 + 1] - m_u[i1]) / (x[i + 1] - x[i]);
+        i0++;
+        i1++;
+      }
+      i1++;
+    }
+  }
+}
+
+void StaggeredGrid::dvdy(Array<StaggeredGrid> &g)
+{
+  int j0 = 0, j1 = 0;
+  for(int k = 0; k < nk; k++) {
+    for(int i = 0; i < ni; i++) {
+      for(int j = 0; j < nj; j++) {
+        g[j0] = (m_v[j1 + 1] - m_v[j1]) / (y[j + 1] - y[j]);
+        j0++;
+        j1++;
+      }
+      j1++;
+    }
+  }
 }
 
 //void StaggeredGrid::setU(std::function<double(double, double)> f)
 void StaggeredGrid::setU(double(*f)(double x, double y))
 {
-  for(unsigned k = 0; k < nk; k++) {
-    for(unsigned j = 0; j < nj; j++) {
+  for(int k = 0; k < nk; k++) {
+    for(int j = 0; j < nj; j++) {
       double yy = ym[j];
-      for(unsigned i = 0; i < nu; i++) {
+      for(int i = 0; i < nu; i++) {
         m_u[UINDEX(i, j, 0, nu, nj, nk)] = f(x[i], yy);
       }
     }
@@ -143,11 +286,11 @@ void StaggeredGrid::setU(double(*f)(double x, double y))
 
 void StaggeredGrid::setV(double(*f)(double x, double y))
 {
-  for(unsigned k = 0; k < nk; k++) {
-    for(unsigned i = 0; i < ni; i++) {
+  for(int k = 0; k < nk; k++) {
+    for(int i = 0; i < ni; i++) {
       double xx = xm[i];
-      for(unsigned j = 0; j < nv; j++) {
-        //m_u[UINDEX(i, j, k, nu, ny, nz)] = f(xx, y[i]);
+      for(int j = 0; j < nv; j++) {
+        m_v[VINDEX(i, j, k, ni, nv, nk)] = f(xx, y[j]);
       }
     }
   }
@@ -157,19 +300,19 @@ void StaggeredGrid::setV(double(*f)(double x, double y))
 void StaggeredGrid::setU(double(*f)(double x, double y, double z))
 {
   if(nw) {
-    for(unsigned k = 0; k < nk; k++) {
+    for(int k = 0; k < nk; k++) {
       double zz = 0.0;
-      for(unsigned j = 0; j < nj; j++) {
+      for(int j = 0; j < nj; j++) {
         double yy = 0.5*(y[j] + y[j + 1]);
-        for(unsigned i = 0; i < nu; i++) {
+        for(int i = 0; i < nu; i++) {
           m_u[UINDEX(i, j, k, nu, nj, nk)] = f(x[i], yy, zz);
         }
       }
     }
   } else {
-    for(unsigned j = 0; j < nj; j++) {
-      double yy = 0.5*(y[j] + y[j+1]);
-      for(unsigned i = 0; i < nu; i++) {
+    for(int j = 0; j < nj; j++) {
+      double yy = 0.5*(y[j] + y[j + 1]);
+      for(int i = 0; i < nu; i++) {
         m_u[UINDEX(i, j, 0, nu, nj, nk)] = f(x[i], yy, 0.0);
       }
     }
@@ -186,43 +329,40 @@ void StaggeredGrid::setW(double(*f)(double x, double y, double z))
 
 }
 
-double *StaggeredGrid::allocateVariable()
+void StaggeredGrid::setEastU(double(*f)(double y))
 {
-  return (double*)callocate(m_ncells, sizeof(double), "cell-centered variable");
-}
-
-void StaggeredGrid::divg(Array<StaggeredGrid> &g)
-{
-  //Array<StaggeredGrid> g(this);
-  unsigned i0 = 0, i1 = 0;
-  for(unsigned k = 0; k < ni; k++) {
-    for(unsigned j = 0; j < nj; j++) {
-      for(unsigned i = 0; i < ni; i++) { 
-        g[i0] = (m_u[i1 + 1] - m_u[i1]) / dx[i];
-        i0++;
-        i1++;
-      }
-      i1++;
+  for(int k = 0; k < nk; k++) {
+    for(int j = 0; j < nj; j++) {
+      m_u[UINDEX(0, j, k, ni, nv, nk)] = f(ym[j]);
     }
   }
-  //return g;
 }
 
-void StaggeredGrid::dudx(Array<StaggeredGrid> &g)
+void StaggeredGrid::setWestU(double(*f)(double y))
 {
-  //Array<StaggeredGrid> g(this);
-  unsigned i0 = 0, i1 = 0;
-  for(unsigned k = 0; k < ni; k++) {
-    for(unsigned j = 0; j < nj; j++) {
-      for(unsigned i = 0; i < ni; i++) {
-        g[i0] = (m_u[i1 + 1] - m_u[i1]) / dx[i];
-        i0++;
-        i1++;
-      }
-      i1++;
+  for(int k = 0; k < nk; k++) {
+    for(int j = 0; j < nj; j++) {
+      m_u[UINDEX(nu, j, k, ni, nv, nk)] = f(ym[j]);
     }
   }
-  //return g;
+}
+
+void StaggeredGrid::setNorthU(double(*f)(double x))
+{
+  for(int k = 0; k < nk; k++) {
+    for(int i = 0; i < nu; i++) {
+      m_u_n[IKINDEX(i, k, nu, nk)] = f(x[i]);
+    }
+  }
+}
+
+void StaggeredGrid::setSouthU(double(*f)(double x))
+{
+  for(int k = 0; k < nk; k++) {
+    for(int i = 0; i < nu; i++) {
+      m_u_s[IKINDEX(i, k, nu, nk)] = f(x[i]);
+    }
+  }
 }
 
 }

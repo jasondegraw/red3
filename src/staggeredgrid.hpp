@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2016 Jason W. DeGraw
+// Copyright (C) 2015-2017 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,15 +28,61 @@ namespace red3
 class RED3_API StaggeredGrid
 {
 public:
-  StaggeredGrid(unsigned nnx, unsigned nny, unsigned nnz=1);
-  virtual ~StaggeredGrid();
+  StaggeredGrid(int ni, int nj, int nk=1, bool xperi=false);
+  virtual ~StaggeredGrid()
+  {}
 
-  double u(size_t i, size_t j, size_t k) { return m_u[INDEX(i,j,k,nu,nj,nk)]; }
-  double v(size_t i, size_t j, size_t k) { return m_v[INDEX(j,i,k,nv,ni,nk)]; }
-  double w(size_t i, size_t j, size_t k) { return m_w[INDEX(k,j,i,nw,nj,ni)]; }
-  double p(size_t i, size_t j, size_t k) { return m_p[INDEX(i,j,k,nk,nj,nk)]; }
+  inline double u(int i, int j, int k) { return m_u[UINDEX(i, j, k, nu, nj, nk)]; }
+  inline double v(int i, int j, int k) { return m_v[VINDEX(i, j, k, ni, nv, nk)]; }
+  inline double w(int i, int j, int k) { return m_w[WINDEX(i, j, k, ni, nj, nw)]; }
+  inline double p(int i, int j, int k) { return m_p[INDEX(i, j, k, nk, nj, nk)]; }
+  //inline double var(int n, int i, int j, int k) { return m_var[n][INDEX(i, j, k, nk, nj, nk)]; }
+
+  double northU(int i, int k) { return m_u_n[IKINDEX(i, k, nu, nk)]; }
+  double southU(int i, int k) { return m_u_s[IKINDEX(i, k, nu, nk)]; }
+
+  template <typename M> void divg(M &g)
+  {
+    int i0 = 0, i1 = 0, j0 = 0, j1 = 0;
+    for(int k = 0; k < nk; k++) {
+      for(int j = 0; j < nj; j++) {
+        for(int i = 0; i < ni; i++) {
+          g[i0] = (m_u[i1 + 1] - m_u[i1]) * m_rdx[i];
+          i0++;
+          i1++;
+        }
+        i1++;
+      }
+    }
+    for(int k = 0; k < nk; k++) {
+      for(int i = 0; i < ni; i++) {
+        for(int j = 0; j < nj; j++) {
+          g[j0] += (m_v[j1 + 1] - m_v[j1]) * m_rdy[j];
+          j0++;
+          j1++;
+        }
+        j1++;
+      }
+    }
+    if(nw) {
+      int k0 = 0, k1 = 0;
+      for(int j = 0; j < nj; j++) {
+        for(int i = 0; i < ni; i++) {
+          for(int k = 0; k < nk; k++) {
+            g[k0] += (m_w[k1 + 1] - m_w[k1]) * m_rdz[k];
+            k0++;
+            k1++;
+          }
+          k1++;
+        }
+      }
+    }
+  }
   void divg(Array<StaggeredGrid> &g);
+  void divg(ArrayU<StaggeredGrid> &u, ArrayV<StaggeredGrid> &v, ArrayW<StaggeredGrid> &w, Array<StaggeredGrid> &g);
+  void divg(ArrayU<StaggeredGrid> &u, ArrayV<StaggeredGrid> &v, Array<StaggeredGrid> &g);
   void dudx(Array<StaggeredGrid> &g);
+  void dvdy(Array<StaggeredGrid> &g);
 
   //void setU(std::function<double(double, double)> f);
   void setU(double(*f)(double x, double y));
@@ -46,6 +92,12 @@ public:
   void setU(double(*f)(double x, double y, double z));
   void setV(double(*f)(double x, double y, double z));
   void setW(double(*f)(double x, double y, double z));
+
+  void setEastU(double(*f)(double y));
+  void setWestU(double(*f)(double y));
+  void setNorthU(double(*f)(double x));
+  void setSouthU(double(*f)(double x));
+
 
   double *allocateVariable();
   void divg(double *g);
@@ -58,13 +110,15 @@ public:
   //double ym(size_t i, size_t j, size_t k) { return m_ym[i]; }
   //double zm(size_t i, size_t j, size_t k) { return m_zm[i]; }
 
-  const unsigned ni;
-  const unsigned nj;
-  const unsigned nk;
+  const int ni;
+  const int nj;
+  const int nk;
 
-  const unsigned nu;
-  const unsigned nv;
-  const unsigned nw;
+  const int nu;
+  const int nv;
+  const int nw;
+
+  const bool xperi;
 
   std::vector<double> x;
   std::vector<double> dx;
@@ -77,16 +131,23 @@ public:
   std::vector<double> zm;
 
 protected:
-  unsigned m_nx;
-  unsigned m_ny;
-  unsigned m_nz;
-  unsigned m_nu;
-  unsigned m_nv;
-  unsigned m_nw;
-  unsigned m_ncells;
+  int m_nx;
+  int m_ny;
+  int m_nz;
+  int m_nu;
+  int m_nv;
+  int m_nw;
+  int m_ncells;
 
-  double m_reynum;
-  double m_dt;
+  int m_dimension;
+
+  std::vector<double> m_dx;
+  std::vector<double> m_dy;
+  std::vector<double> m_dz;
+
+  std::vector<double> m_rdx;
+  std::vector<double> m_rdy;
+  std::vector<double> m_rdz;
 
   std::vector<double> m_x;
   std::vector<double> m_xm;
@@ -95,10 +156,13 @@ protected:
   std::vector<double> m_z;
   std::vector<double> m_zm;
 
-  double *m_u;
-  double *m_v;
-  double *m_w;
-  double *m_p;
+  std::unique_ptr<double[]> m_u;
+  std::unique_ptr<double[]> m_v;
+  std::unique_ptr<double[]> m_w;
+  std::unique_ptr<double[]> m_p;
+
+  double *m_u_n;
+  double *m_u_s;
 
 //private:
 //  bool allocateSolution();

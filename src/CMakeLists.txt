@@ -9,6 +9,7 @@ set(SRCS array.cpp
          grid.cpp
          util.cpp
          staggeredgrid.cpp
+         upwind.cpp
          util.cpp)
 
 set(HDRS red3api.hpp
@@ -18,6 +19,7 @@ set(HDRS red3api.hpp
          grid.hpp
          red3.hpp
          staggeredgrid.hpp
+         upwind.hpp
          util.hpp)
 
 add_library(red3_core SHARED ${HDRS} ${SRCS} ${DEP_SRCS})

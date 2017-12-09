@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
+#ifndef UTIL_HPP
+#define UTIL_HPP
 #include <string>
 
 namespace red3 {
@@ -21,3 +23,5 @@ void fatal(const std::string &mesg);
 void* callocate(size_t num, size_t size, const std::string &name);
 
 }
+
+#endif

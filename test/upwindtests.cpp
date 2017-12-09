@@ -13,16 +13,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
 
-#include "staggeredgrid.hpp"
+#include "upwind.hpp"
+#include "catch.hpp"
 #include <iostream>
 #include <string>
 
-TEST_CASE("Basic 2D", "[StaggerdGridTests]")
+TEST_CASE("Basic 2D Upwinding", "[upwind]")
 {
-  red3::StaggeredGrid grid(4, 5);
+  red3::upwind::IncompressibleStaggeredSolver grid(4, 5);
   REQUIRE(4 == grid.ni);
   REQUIRE(5 == grid.nu);
   REQUIRE(5 == grid.nj);
@@ -50,43 +49,10 @@ TEST_CASE("Basic 2D", "[StaggerdGridTests]")
   for(unsigned i = 0; i < grid.ni; i++) {
     REQUIRE(ym[i] == Approx(grid.ym[i]));
   }
-  // Check velocity
-  grid.setU([](double x, double y){return x;});
-  grid.setV([](double x, double y){return -y;});
-  for(unsigned j = 0; j < grid.nj; j++) {
-    for(unsigned i = 0; i < grid.nu; i++) {
-      REQUIRE(x[i] == grid.u(i, j, 0)); // << ("Index: (" + std::to_string(i) + "," + std::to_string(j) + ")");
-    }
-  }
-  for(unsigned j = 0; j < grid.nv; j++) {
-    for(unsigned i = 0; i < grid.ni; i++) {
-      REQUIRE(-y[j] == Approx(grid.v(i, j, 0))); // << ("Index: (" + std::to_string(i) + "," + std::to_string(j) + ")");
-    }
-  }
-  // Divergence, etc.
-  red3::Array<red3::StaggeredGrid> g(&grid);
-  grid.dudx(g);
-  for(unsigned j = 0; j < grid.nj; j++) {
-    for(unsigned i = 0; i < grid.ni; i++){
-      REQUIRE(1.0 == g(i, j, 0));
-    }
-  }
-  grid.dvdy(g);
-  for(unsigned j = 0; j < grid.nj; j++) {
-    for(unsigned i = 0; i < grid.ni; i++){
-      REQUIRE(-1.0 == g(i, j, 0));
-    }
-  }
-  grid.divg(g);
-  for(unsigned j = 0; j < grid.nj; j++) {
-    for(unsigned i = 0; i < grid.ni; i++){
-      REQUIRE(0.0 == g(i, j, 0));
-    }
-  }
   // BC Setters
-  grid.setNorthU([](double x){return -x;});
+  grid.setNorthU([](double x){return 1.0;});
   for(unsigned i = 0; i < grid.nu; i++) {
-    REQUIRE(-x[i] == grid.northU(i, 0)); // << ("Index: " + std::to_string(i));
+    REQUIRE(1.0 == grid.northU(i, 0)); // << ("Index: " + std::to_string(i));
   }
 
 }

@@ -13,31 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-
+#include <stdlib.h>
 #include "staggeredgrid.hpp"
-#include "array.hpp"
-#include "catch.hpp"
 
-TEST_CASE("Basic 2D Arrays", "[Array]")
+int main(int argc, char *argv[])
 {
-  red3::StaggeredGrid grid(4, 5);
-  red3::Array<red3::StaggeredGrid> array(&grid);
-  for(unsigned j = 0; j < grid.nj; j++) {
-    for(unsigned i = 0; i < grid.ni; i++) {
-      array(i, j, 0) = i;
-    }
-  }
-  std::vector<double> v = { 0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0,
-    0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0,
-    0.0, 1.0, 2.0, 3.0 };
-  for(unsigned i = 0; i < 20; i++) {
-    REQUIRE(v[i] == array[i]);
-    array[i] = (double)i;
-  }
-  double value = 0.0;
-  for(unsigned i = 0; i < 20; i++) {
-    REQUIRE(value == array[i]);
-    value += 1.0;
-  }
+  return EXIT_SUCCESS;
 }
-

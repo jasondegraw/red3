@@ -20,9 +20,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # JSON Dependency
 #include_directories("dependencies/jsoncpp")
+# Eigen Dependency
+include_directories(dependencies/eigen-eigen-5a0156e40feb/)
 
 add_subdirectory(src)
 add_subdirectory(laminar-channel)
+add_subdirectory(simple2d)
 #add_subdirectory(doc)
 if(MSVC)
   set(gtest_force_shared_crt ON CACHE BOOL "Force gtest to use msvcrt.dll")

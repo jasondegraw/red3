@@ -16,4 +16,6 @@
 
 #define INDEX(i,j,k,ni,nj,nk) ((i)+(j)*(ni)+(k)*(ni)*(nj))
 #define UINDEX(i,j,k,nu,nj,nk) ((i)+(j)*(nu)+(k)*(nu)*(nj))
-#define VINDEX(i,j,k,nu,nj,nk) ((i)+(j)*(nu)+(k)*(nu)*(nj))
+#define VINDEX(i,j,k,ni,nv,nk) ((i)*(nv)+(j)+(k)*(ni)*(nv))
+#define WINDEX(i,j,k,ni,nj,nw) ((i)*(nw)+(j)*(ni)*(nw)+(k))
+#define IKINDEX(i,k,ni,nk) ((i)+(k)*(ni))

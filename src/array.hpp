@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2016 Jason W. DeGraw
+// Copyright (C) 2015-2017 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -63,7 +63,6 @@ public:
   }
   Array(const Array &other) : m_impl(other.m_impl), m_parent(other.m_parent)
   {}
-  virtual ~Array(){}
 
   Array& operator=(const Array &other)
   {
@@ -87,6 +86,132 @@ public:
   inline double &operator()(unsigned i, unsigned j, unsigned k)
   {
     return (m_impl.get())[INDEX(i, j, k, m_parent->ni, m_parent->nj, m_parent->nk)];
+  }
+
+protected:
+  std::shared_ptr<double> m_impl;
+  T *m_parent;
+
+};
+
+template <class T> class ArrayU
+{
+public:
+  ArrayU() : m_parent(nullptr)
+  {}
+  ArrayU(T *parent) : m_parent(parent)
+  {
+    m_impl = std::shared_ptr<double>(new double[m_parent->nu*m_parent->nj*m_parent->nk], std::default_delete<double[]>());
+  }
+  ArrayU(const ArrayU &other) : m_impl(other.m_impl), m_parent(other.m_parent)
+  {}
+
+  ArrayU& operator=(const ArrayU &other)
+  {
+    m_impl = other.m_impl;
+    return *this;
+  }
+  bool operator==(const ArrayU &other) const
+  {
+    return m_impl == other.m_impl;
+  }
+  bool operator!=(const ArrayU &other) const
+  {
+    return m_impl != other.m_impl;
+  }
+
+  inline double &operator[](unsigned i)
+  {
+    return (m_impl.get())[i];
+  }
+
+  inline double &operator()(unsigned i, unsigned j, unsigned k)
+  {
+    return (m_impl.get())[INDEX(i, j, k, m_parent->nu, m_parent->nj, m_parent->nk)];
+  }
+
+protected:
+  std::shared_ptr<double> m_impl;
+  T *m_parent;
+
+};
+
+template <class T> class ArrayV
+{
+public:
+  ArrayV() : m_parent(nullptr)
+  {}
+  ArrayV(T *parent) : m_parent(parent)
+  {
+    m_impl = std::shared_ptr<double>(new double[m_parent->ni*m_parent->nv*m_parent->nk], std::default_delete<double[]>());
+  }
+  ArrayV(const ArrayV &other) : m_impl(other.m_impl), m_parent(other.m_parent)
+  {}
+
+  ArrayV& operator=(const ArrayV &other)
+  {
+    m_impl = other.m_impl;
+    return *this;
+  }
+  bool operator==(const ArrayV &other) const
+  {
+    return m_impl == other.m_impl;
+  }
+  bool operator!=(const ArrayV &other) const
+  {
+    return m_impl != other.m_impl;
+  }
+
+  inline double &operator[](unsigned i)
+  {
+    return (m_impl.get())[i];
+  }
+
+  inline double &operator()(unsigned i, unsigned j, unsigned k)
+  {
+    return (m_impl.get())[INDEX(i, j, k, m_parent->ni, m_parent->nv, m_parent->nk)];
+  }
+
+protected:
+  std::shared_ptr<double> m_impl;
+  T *m_parent;
+
+};
+
+template <class T> class ArrayW
+{
+public:
+  ArrayW() : m_parent(nullptr)
+  {}
+  ArrayW(T *parent) : m_parent(parent)
+  {
+    m_impl = std::shared_ptr<double>(new double[m_parent->ni*m_parent->nj*m_parent->nw], std::default_delete<double[]>());
+  }
+  ArrayW(const ArrayW &other) : m_impl(other.m_impl), m_parent(other.m_parent)
+  {}
+
+  ArrayW& operator=(const ArrayW &other)
+  {
+    m_impl = other.m_impl;
+    return *this;
+  }
+  bool operator==(const ArrayW &other) const
+  {
+    return m_impl == other.m_impl;
+  }
+  bool operator!=(const ArrayW &other) const
+  {
+    return m_impl != other.m_impl;
+  }
+
+  inline double &operator[](unsigned i)
+  {
+    return (m_impl.get())[i];
+  }
+
+  inline double &operator()(unsigned i, unsigned j, unsigned k)
+  {
+    return (m_impl.get())[WINDEX(i, j, k, m_parent->ni, m_parent->nj, m_parent->nw)];
   }
 
 protected:

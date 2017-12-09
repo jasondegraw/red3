@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Jason W. DeGraw
+// Copyright (C) 2015-2016 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,8 +26,9 @@ public:
   virtual ~Grid1D(){}
   virtual std::vector<double> grid() = 0;
   virtual std::vector<double> midgrid() = 0;
-  virtual double delta(unsigned i) = 0;
-  virtual unsigned n() = 0;
+  virtual double delta(unsigned i) const = 0;
+  virtual double delta0() const = 0;
+  virtual unsigned n() const = 0;
 };
 
 class RED3_API Uniform : public Grid1D
@@ -37,11 +38,23 @@ public:
   virtual ~Uniform(){}
   virtual std::vector<double> grid();
   virtual std::vector<double> midgrid();
-  virtual double delta(unsigned)
+  virtual std::vector<double> deltas()
+  {
+    std::vector<double> d(m_n);
+    for(unsigned i = 0; i < m_n; i++) {
+      d[i] = m_dx;
+    }
+    return d;
+  }
+  virtual double delta(unsigned) const
   {
     return m_dx;
   }
-  virtual unsigned n()
+  virtual double delta0() const
+  {
+    return m_dx;
+  }
+  virtual unsigned n() const
   {
     return m_n;
   }
