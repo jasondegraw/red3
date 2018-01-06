@@ -17,6 +17,7 @@
 #define STAGGEREDGRID_HPP
 #include <vector>
 #include <functional>
+#include <memory>
 
 #include "red3api.hpp"
 #include "arrayops.hpp"

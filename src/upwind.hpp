@@ -18,7 +18,6 @@
 #include "staggeredgrid.hpp"
 #include "array.hpp"
 #include <functional>
-#include <memory>
 #include "red3api.hpp"
 #include <Eigen/Sparse>
 
