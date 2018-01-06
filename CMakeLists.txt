@@ -27,9 +27,6 @@ add_subdirectory(src)
 add_subdirectory(laminar-channel)
 add_subdirectory(simple2d)
 #add_subdirectory(doc)
-if(MSVC)
-  set(gtest_force_shared_crt ON CACHE BOOL "Force gtest to use msvcrt.dll")
-endif()
-add_subdirectory(dependencies/gtest-1.7.0)
+
 add_subdirectory(test)
 

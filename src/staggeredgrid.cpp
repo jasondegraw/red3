@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2016 Jason W. DeGraw
+// Copyright (C) 2015-2017 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ namespace red3
 {
 
 StaggeredGrid::StaggeredGrid(int ni, int nj, int nk, bool xperi)
-  : ni(ni), nj(nj), nk(nk), nu(ni + 1), nv(nj + 1), nw(nk == 1 ? 0 : nk + 1), xperi(xperi)
+  : ni(ni), nj(nj), nk(nk), nu(ni + 1), nv(nj + 1), nw(nk == 1 ? 1 : nk + 1), xperi(xperi)
 {
   // Check the inputs
   if(ni < 2) {
@@ -75,7 +75,7 @@ StaggeredGrid::StaggeredGrid(int ni, int nj, int nk, bool xperi)
   dy = yg.deltas();
   double rdy = 1.0 / yg.delta0();
   m_rdy = std::vector<double>(yg.n(), rdy);
-  if(nw) {
+  if(nk > 1) {
     Uniform zg(nv);
     z = zg.grid();
     zm = zg.midgrid();
@@ -164,7 +164,7 @@ void StaggeredGrid::divg(Array<StaggeredGrid> &g)
       j1++;
     }
   }
-  if(nw) {
+  if(nk > 1) {
     int k0 = 0, k1 = 0;
     for(int j = 0; j < nj; j++) {
       for(int i = 0; i < ni; i++) {
@@ -225,7 +225,7 @@ void StaggeredGrid::divg(ArrayU<StaggeredGrid> &u, ArrayV<StaggeredGrid> &v, Arr
       j1++;
     }
   }
-  if(nw) {
+  if(nk > 1) {
     int k0 = 0, k1 = 0;
     for(int j = 0; j < nj; j++) {
       for(int i = 0; i < ni; i++) {
@@ -299,7 +299,7 @@ void StaggeredGrid::setV(double(*f)(double x, double y))
 //void StaggeredGrid::setU(std::function<double(double, double, double)> f)
 void StaggeredGrid::setU(double(*f)(double x, double y, double z))
 {
-  if(nw) {
+  if(nk > 1) {
     for(int k = 0; k < nk; k++) {
       double zz = 0.0;
       for(int j = 0; j < nj; j++) {
@@ -333,7 +333,8 @@ void StaggeredGrid::setEastU(double(*f)(double y))
 {
   for(int k = 0; k < nk; k++) {
     for(int j = 0; j < nj; j++) {
-      m_u[UINDEX(0, j, k, ni, nv, nk)] = f(ym[j]);
+      //std::cout << 0 << ' ' << j << ' ' << k << ' ' << INDEX(0, j, k, nu, nj, nk) << ' ' << f(ym[j]) << std::endl;
+      m_u[INDEX(0, j, k, nu, nj, nk)] = f(ym[j]);
     }
   }
 }
@@ -342,7 +343,7 @@ void StaggeredGrid::setWestU(double(*f)(double y))
 {
   for(int k = 0; k < nk; k++) {
     for(int j = 0; j < nj; j++) {
-      m_u[UINDEX(nu, j, k, ni, nv, nk)] = f(ym[j]);
+      m_u[INDEX(ni, j, k, nu, nj, nk)] = f(ym[j]);
     }
   }
 }

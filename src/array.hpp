@@ -88,6 +88,16 @@ public:
     return (m_impl.get())[INDEX(i, j, k, m_parent->ni, m_parent->nj, m_parent->nk)];
   }
 
+  int size()
+  {
+    return m_parent->ni*m_parent->nj*m_parent->nk;
+  }
+
+  T* parent()
+  {
+    return m_parent;
+  }
+
 protected:
   std::shared_ptr<double> m_impl;
   T *m_parent;
@@ -128,6 +138,68 @@ public:
   inline double &operator()(unsigned i, unsigned j, unsigned k)
   {
     return (m_impl.get())[INDEX(i, j, k, m_parent->nu, m_parent->nj, m_parent->nk)];
+  }
+
+  int size()
+  {
+    return m_parent->nu*m_parent->nj*m_parent->nk;
+  }
+
+  T* parent()
+  {
+    return m_parent;
+  }
+
+protected:
+  std::shared_ptr<double> m_impl;
+  T *m_parent;
+
+};
+
+template <class T> class ArrayUVW
+{
+public:
+  ArrayUVW() : m_parent(nullptr), m_impl(nullptr)
+  {}
+  ArrayUVW(T *parent) : m_parent(parent)
+  {
+    m_impl = std::shared_ptr<double>(new double[m_parent->nu*m_parent->nv*m_parent->nw], std::default_delete<double[]>());
+  }
+  ArrayUVW(const ArrayUVW &other) : m_impl(other.m_impl), m_parent(other.m_parent)
+  {}
+
+  ArrayUVW& operator=(const ArrayUVW &other)
+  {
+    m_impl = other.m_impl;
+    return *this;
+  }
+  bool operator==(const ArrayUVW &other) const
+  {
+    return m_impl == other.m_impl;
+  }
+  bool operator!=(const ArrayUVW &other) const
+  {
+    return m_impl != other.m_impl;
+  }
+
+  inline double &operator[](unsigned i)
+  {
+    return (m_impl.get())[i];
+  }
+
+  inline double &operator()(unsigned i, unsigned j, unsigned k)
+  {
+    return (m_impl.get())[INDEX(i, j, k, m_parent->nu, m_parent->nv, m_parent->nw)];
+  }
+
+  int size()
+  {
+    return m_parent->nu*m_parent->nv*m_parent->nw;
+  }
+
+  T* parent()
+  {
+    return m_parent;
   }
 
 protected:

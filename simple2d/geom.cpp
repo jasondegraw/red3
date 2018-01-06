@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2016 Jason W. DeGraw
+// Copyright (C) 2015-2017 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,9 +14,28 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 #include <stdlib.h>
-#include "staggeredgrid.hpp"
+#include "upwind.hpp"
+#include <iostream>
 
 int main(int argc, char *argv[])
 {
+  red3::upwind::StaggeredIncompressibleSteadyFlow solver(100.0, 1.0, 9, 9);
+  red3::Array<red3::StaggeredGrid> pstar(&solver);
+  red3::ArrayU<red3::StaggeredGrid> ustar(&solver);
+  red3::ArrayV<red3::StaggeredGrid> vstar(&solver);
+
+  solver.setEastU([](double x) {return 4*x*(1.0 - x); });
+  solver.setWestU([](double x) {return 4*x*(1.0 - x); });
+  for (int j = 0; j < solver.nj; j++) {
+    std::cout << solver.xm[j] << ' ' << solver.u(0, j, 0) << ' ' << solver.u(solver.ni, j, 0) << std::endl;
+  }
+
+  std::cout << solver.ni << ' ' << solver.nj << ' ' << solver.nk << std::endl;
+  std::cout << solver.nu << ' ' << solver.nv << ' ' << solver.nw << std::endl;
+  std::cout << solver.ae.size() << ' ' << solver.aw.size() << ' ' << solver.an.size() << ' ' << solver.as.size() << std::endl;
+  std::cout << solver.ae.parent() << ' ' << &solver << std::endl;
+
+  solver.setupU();
+
   return EXIT_SUCCESS;
 }

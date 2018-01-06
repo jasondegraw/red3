@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2016 Jason W. DeGraw
+// Copyright (C) 2015-2017 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,13 +21,13 @@
 
 TEST_CASE("Basic 2D Upwinding", "[upwind]")
 {
-  red3::upwind::IncompressibleStaggeredSolver grid(4, 5);
+  red3::upwind::StaggeredIncompressibleSteadyFlow grid(100.0, 1.0, 4, 5);
   REQUIRE(4 == grid.ni);
   REQUIRE(5 == grid.nu);
   REQUIRE(5 == grid.nj);
   REQUIRE(6 == grid.nv);
   REQUIRE(1 == grid.nk);
-  REQUIRE(0 == grid.nw);
+  REQUIRE(1 == grid.nw);
   // Check grid
   REQUIRE(5 == grid.x.size());
   std::vector<double> x = { 0.0, 0.25, 0.5, 0.75, 1.0 };

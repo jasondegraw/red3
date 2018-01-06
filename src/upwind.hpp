@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2016 Jason W. DeGraw
+// Copyright (C) 2015-2017 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 #ifndef UPWIND_HPP
 #define UPWIND_HPP
 #include "staggeredgrid.hpp"
+#include "array.hpp"
 #include <functional>
 #include "red3api.hpp"
 #include <Eigen/Sparse>
@@ -23,26 +24,27 @@
 namespace red3 {
 namespace upwind {
 
-class RED3_API IncompressibleStaggeredSolver : public StaggeredGrid
+class RED3_API StaggeredIncompressibleSteadyFlow : public StaggeredGrid
 {
 public:
   enum class BoundaryCondition {  };
   enum class Differencing { FirstOrder, Hybrid, PowerLaw, Central };
-  IncompressibleStaggeredSolver(unsigned ni, unsigned nj, unsigned nk = 1, Differencing diff = Differencing::FirstOrder,
-    bool xperi = false) : StaggeredGrid(ni, nj, nk, xperi), differencing(diff)
+  StaggeredIncompressibleSteadyFlow(double rho, double mu, unsigned ni, unsigned nj, unsigned nk = 1, 
+    Differencing diff = Differencing::FirstOrder, bool xperi = false) : StaggeredGrid(ni, nj, nk, xperi), differencing(diff),
+    ae(this), aw(this), an(this), as(this), af(this), ab(this), b(this), rho(rho), mu(mu)
   {
     switch(differencing) {
     case Differencing::FirstOrder:
-      m_A = std::bind(&IncompressibleStaggeredSolver::firstOrderUpwind, this, std::placeholders::_1);
+      A = std::bind(&StaggeredIncompressibleSteadyFlow::firstOrderUpwind, this, std::placeholders::_1);
       break;
     case Differencing::Hybrid:
-      m_A = std::bind(&IncompressibleStaggeredSolver::hybrid, this, std::placeholders::_1);
+      A = std::bind(&StaggeredIncompressibleSteadyFlow::hybrid, this, std::placeholders::_1);
       break;
     case Differencing::Central:
-      m_A = std::bind(&IncompressibleStaggeredSolver::centralDifference, this, std::placeholders::_1);
+      A = std::bind(&StaggeredIncompressibleSteadyFlow::centralDifference, this, std::placeholders::_1);
       break;
     case Differencing::PowerLaw:
-      m_A = std::bind(&IncompressibleStaggeredSolver::powerLaw, this, std::placeholders::_1);
+      A = std::bind(&StaggeredIncompressibleSteadyFlow::powerLaw, this, std::placeholders::_1);
       break;
     }
 
@@ -74,10 +76,20 @@ public:
     return std::max(0.0, std::pow(1.0 - 0.5*absP, 5));
   }
 
+  void setupU();
+  void setupV();
+  void setupW();
+
   const Differencing differencing;
 
+  ArrayU<StaggeredIncompressibleSteadyFlow> ae, aw, an, as, af, ab, b;
+  const double rho;
+  const double mu;
+
+  std::function<double(double)> A;
+
 private:
-  std::function<double(double)> m_A;
+  //std::function<double(double)> m_A;
   Eigen::SparseMatrix<double> m_Mu;
   Eigen::SparseMatrix<double> m_Mv;
   Eigen::SparseMatrix<double> m_Mw;

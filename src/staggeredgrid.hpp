@@ -38,6 +38,11 @@ public:
   inline double p(int i, int j, int k) { return m_p[INDEX(i, j, k, nk, nj, nk)]; }
   //inline double var(int n, int i, int j, int k) { return m_var[n][INDEX(i, j, k, nk, nj, nk)]; }
 
+  inline double u(int ijk) { return m_u[ijk]; }
+  inline double v(int ijk) { return m_v[ijk]; }
+  inline double w(int ijk) { return m_w[ijk]; }
+  inline double p(int ijk) { return m_p[ijk]; }
+
   double northU(int i, int k) { return m_u_n[IKINDEX(i, k, nu, nk)]; }
   double southU(int i, int k) { return m_u_s[IKINDEX(i, k, nu, nk)]; }
 
