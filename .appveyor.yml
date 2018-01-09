@@ -16,3 +16,7 @@ build:
   project: build\red3.sln
   parallel: true
   verbosity: normal        # quiet|minimal|normal|detailed
+
+test_script:
+  - cd build
+  - red3tests.exe
