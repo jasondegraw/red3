@@ -18,5 +18,4 @@ build:
   verbosity: normal        # quiet|minimal|normal|detailed
 
 test_script:
-  - cd build
-  - red3tests.exe
+  - build/bin/Release/red3tests.exe
