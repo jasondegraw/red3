@@ -18,4 +18,4 @@ build:
   verbosity: normal        # quiet|minimal|normal|detailed
 
 test_script:
-  - build/bin/Release/red3tests.exe
+  - bin/Release/red3tests.exe
