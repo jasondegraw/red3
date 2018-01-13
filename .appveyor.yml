@@ -11,8 +11,14 @@ before_build:
   - mkdir build
   - cd build
   - cmake -A%PLATFORM% ..
+  - cd ..
 
 build:
   project: build\red3.sln
   parallel: true
   verbosity: normal        # quiet|minimal|normal|detailed
+
+test_script:
+  - cd build\bin\Release
+  - cmd: red3tests.exe
+  - cd ..\..\..
