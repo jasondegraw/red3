@@ -47,6 +47,9 @@ public:
   double northU(int i, int k) { return m_u_n[IKINDEX(i, k, nu, nk)]; }
   double southU(int i, int k) { return m_u_s[IKINDEX(i, k, nu, nk)]; }
 
+  double eastU(int j, int k) { return m_u[UINDEX(0, j, k, nu, nj, nk)]; }
+  double westU(int j, int k) { return m_u[UINDEX(0, j, k, nu, nj, nk)]; }
+
   template <typename M> void divg(M &g)
   {
     int i0 = 0, i1 = 0, j0 = 0, j1 = 0;
@@ -103,6 +106,11 @@ public:
   void setWestU(double(*f)(double y));
   void setNorthU(double(*f)(double x));
   void setSouthU(double(*f)(double x));
+
+  ArrayX<int*, int*, int*> uArray()
+  {
+    return ArrayX<&nu, &nj, &nk>();
+  }
 
 
   double *allocateVariable();

@@ -21,6 +21,58 @@
 #include "arrayops.hpp"
 
 namespace red3 {
+
+template <typename I, typename J, typename K> class ArrayX
+{
+public:
+
+  bool operator==(const ArrayX<I, J, K> &other) const
+  {
+    return m_impl == other.m_impl;
+  }
+
+  bool operator!=(const ArrayX<I, J, K> &other) const
+  {
+    return m_impl != other.m_impl;
+  }
+
+  inline double &operator[](unsigned i)
+  {
+    return (m_impl.get())[i];
+  }
+
+  inline double &operator()(unsigned i, unsigned j, unsigned k)
+  {
+    return (m_impl.get())[INDEX(i, j, k, *I, *J, *K)];
+  }
+
+  int size()
+  {
+    return (*I)*(*J)*(*K);
+  }
+
+  void copy(ArrayX<I, J, K> &other)
+  {
+    for (int ijk = 0; i < (*I)*(*J)*(*K); ++ijk) {
+      (m_impl.get())[ijk] = (other.m_impl.get())[ijk];
+    }
+  }
+
+protected:
+  ArrayX()
+  {}
+
+  void allocate()
+  {
+    m_impl = std::shared_ptr<double>(new double[(*I)*(*J)*(*K)], std::default_delete<double[]>());
+  }
+
+  std::shared_ptr<double> m_impl;
+
+  friend class StaggeredGrid;
+
+};
+
 /*
 class RED3_API Array
 {
@@ -138,6 +190,12 @@ public:
   inline double &operator()(unsigned i, unsigned j, unsigned k)
   {
     return (m_impl.get())[INDEX(i, j, k, m_parent->nu, m_parent->nj, m_parent->nk)];
+  }
+
+  inline double copy(ArrayU &other)
+  {
+    int nijk = m_parent->nu * m_parent->nj * m_parent->nk;
+
   }
 
   int size()

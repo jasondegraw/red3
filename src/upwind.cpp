@@ -62,7 +62,6 @@ void StaggeredIncompressibleSteadyFlow::setupU()
       double Dn = mu*(dx[i - 1] + dx[i]) / (dy[j] + dy[j + 1]); // 0.5s cancel out
       double Ds = mu*(dx[i - 1] + dx[i]) / (dy[j - 1] + dy[j]); // 0.5s cancel out
 
-      /*
       // Compute the coefficients
       ae[ijk] = De*A(std::abs(Fe / De)) + std::max(-Fe, 0.0);
       aw[ijk] = Dw*A(std::abs(Fw / Dw)) + std::max( Fw, 0.0);
@@ -81,10 +80,8 @@ void StaggeredIncompressibleSteadyFlow::setupU()
       int p2(INDEX(i, j, k, ni, nj, nk));
       int p1(p2 - 1);
       b[ijk] = 2.0*(p(p1) - p(p2)) / (ap*(dx[i - 1] + dx[i]));
-      */
     }
   }
-  /*
   // South boundary of block
   //
   //              N
@@ -224,7 +221,6 @@ void StaggeredIncompressibleSteadyFlow::setupU()
     b[ijk] = 2*(p(p1) - p(p2)) / (ap*(dx[i - 1] + dx[i])) + as[ijk] * 2*northU(i, k);
 
   }
-  */
 
 }
 

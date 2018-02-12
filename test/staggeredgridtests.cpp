@@ -89,5 +89,7 @@ TEST_CASE("Basic 2D", "[StaggerdGridTests]")
     REQUIRE(-x[i] == grid.northU(i, 0)); // << ("Index: " + std::to_string(i));
   }
 
+  auto us = grid.uArray();
+
 }
 

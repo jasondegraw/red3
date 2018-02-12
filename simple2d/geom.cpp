@@ -37,5 +37,11 @@ int main(int argc, char *argv[])
 
   solver.setupU();
 
+  for (int j = 0; j < solver.nj; j++) {
+    std::cout << j << ' ' << solver.xm[j] << ' ' << solver.eastU(j, 0) << std::endl; // ' ' << solver.u(solver.ni, j, 0) << std::endl;
+  }
+
+  //auto us = solver.uArray();
+
   return EXIT_SUCCESS;
 }
