@@ -24,13 +24,13 @@
 namespace red3 {
 namespace upwind {
 
-class RED3_API StaggeredIncompressibleSteadyFlow : public StaggeredGrid
+class RED3_API StaggeredIncompressibleSteadyFlow : public BasicStaggeredGrid<StaggeredIncompressibleSteadyFlow>
 {
 public:
   enum class BoundaryCondition {  };
   enum class Differencing { FirstOrder, Hybrid, PowerLaw, Central };
   StaggeredIncompressibleSteadyFlow(double rho, double mu, unsigned ni, unsigned nj, unsigned nk = 1, 
-    Differencing diff = Differencing::FirstOrder, bool xperi = false) : StaggeredGrid(ni, nj, nk, xperi), differencing(diff),
+    Differencing diff = Differencing::FirstOrder, bool xperi = false) : BasicStaggeredGrid<StaggeredIncompressibleSteadyFlow>(ni, nj, nk, xperi), differencing(diff),
     ae(this), aw(this), an(this), as(this), af(this), ab(this), b(this), rho(rho), mu(mu)
   {
     switch(differencing) {

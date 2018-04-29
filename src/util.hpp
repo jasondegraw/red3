@@ -16,11 +16,12 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 #include <string>
+#include "red3api.hpp"
 
 namespace red3 {
 
-void fatal(const std::string &mesg);
-void* callocate(size_t num, size_t size, const std::string &name);
+void RED3_API fatal(const std::string &mesg);
+RED3_API void* callocate(size_t num, size_t size, const std::string &name);
 
 }
 

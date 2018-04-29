@@ -119,6 +119,7 @@ public:
   Array& operator=(const Array &other)
   {
     m_impl = other.m_impl;
+    m_parent = other.m_parent;
     return *this;
   }
   bool operator==(const Array &other) const
@@ -131,6 +132,11 @@ public:
   }
 
   inline double &operator[](unsigned i)
+  {
+    return (m_impl.get())[i];
+  }
+
+  inline double &operator()(unsigned i)
   {
     return (m_impl.get())[i];
   }
@@ -161,22 +167,27 @@ template <class T> class ArrayU
 public:
   ArrayU() : m_parent(nullptr)
   {}
+
   ArrayU(T *parent) : m_parent(parent)
   {
     m_impl = std::shared_ptr<double>(new double[m_parent->nu*m_parent->nj*m_parent->nk], std::default_delete<double[]>());
   }
+
   ArrayU(const ArrayU &other) : m_impl(other.m_impl), m_parent(other.m_parent)
   {}
 
   ArrayU& operator=(const ArrayU &other)
   {
     m_impl = other.m_impl;
+    m_parent = other.m_parent;
     return *this;
   }
+
   bool operator==(const ArrayU &other) const
   {
     return m_impl == other.m_impl;
   }
+
   bool operator!=(const ArrayU &other) const
   {
     return m_impl != other.m_impl;
@@ -187,9 +198,14 @@ public:
     return (m_impl.get())[i];
   }
 
+  inline double &operator()(unsigned i)
+  {
+    return (m_impl.get())[i];
+  }
+
   inline double &operator()(unsigned i, unsigned j, unsigned k)
   {
-    return (m_impl.get())[INDEX(i, j, k, m_parent->nu, m_parent->nj, m_parent->nk)];
+    return (m_impl.get())[UINDEX(i, j, k, m_parent->nu, m_parent->nj, m_parent->nk)];
   }
 
   inline double copy(ArrayU &other)
@@ -229,18 +245,26 @@ public:
   ArrayUVW& operator=(const ArrayUVW &other)
   {
     m_impl = other.m_impl;
+    m_parent = other.m_parent
     return *this;
   }
+
   bool operator==(const ArrayUVW &other) const
   {
     return m_impl == other.m_impl;
   }
+
   bool operator!=(const ArrayUVW &other) const
   {
     return m_impl != other.m_impl;
   }
 
   inline double &operator[](unsigned i)
+  {
+    return (m_impl.get())[i];
+  }
+
+  inline double &operator()(unsigned i)
   {
     return (m_impl.get())[i];
   }
@@ -281,6 +305,7 @@ public:
   ArrayV& operator=(const ArrayV &other)
   {
     m_impl = other.m_impl;
+    m_parent = other.m_parent;
     return *this;
   }
   bool operator==(const ArrayV &other) const
@@ -297,9 +322,14 @@ public:
     return (m_impl.get())[i];
   }
 
+  inline double &operator()(unsigned i)
+  {
+    return (m_impl.get())[i];
+  }
+
   inline double &operator()(unsigned i, unsigned j, unsigned k)
   {
-    return (m_impl.get())[INDEX(i, j, k, m_parent->ni, m_parent->nv, m_parent->nk)];
+    return (m_impl.get())[VINDEX(i, j, k, m_parent->ni, m_parent->nv, m_parent->nk)];
   }
 
 protected:
@@ -323,6 +353,7 @@ public:
   ArrayW& operator=(const ArrayW &other)
   {
     m_impl = other.m_impl;
+    m_parent = other.m_parent;
     return *this;
   }
   bool operator==(const ArrayW &other) const
@@ -335,6 +366,11 @@ public:
   }
 
   inline double &operator[](unsigned i)
+  {
+    return (m_impl.get())[i];
+  }
+
+  inline double &operator()(unsigned i)
   {
     return (m_impl.get())[i];
   }

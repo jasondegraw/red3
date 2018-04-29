@@ -20,7 +20,7 @@
 #include <iostream>
 #include <string>
 
-TEST_CASE("Basic 2D", "[StaggerdGridTests]")
+TEST_CASE("Basic 2D", "[StaggerdGrid]")
 {
   red3::StaggeredGrid grid(4, 5);
   REQUIRE(4 == grid.ni);
@@ -64,7 +64,8 @@ TEST_CASE("Basic 2D", "[StaggerdGridTests]")
     }
   }
   // Divergence, etc.
-  red3::Array<red3::StaggeredGrid> g(&grid);
+  //red3::Array<red3::StaggeredGrid> g(&grid);
+  auto g = grid.array();
   grid.dudx(g);
   for(unsigned j = 0; j < grid.nj; j++) {
     for(unsigned i = 0; i < grid.ni; i++){

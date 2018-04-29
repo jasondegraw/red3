@@ -20,9 +20,9 @@
 int main(int argc, char *argv[])
 {
   red3::upwind::StaggeredIncompressibleSteadyFlow solver(100.0, 1.0, 9, 9);
-  red3::Array<red3::StaggeredGrid> pstar(&solver);
-  red3::ArrayU<red3::StaggeredGrid> ustar(&solver);
-  red3::ArrayV<red3::StaggeredGrid> vstar(&solver);
+  red3::Array<red3::upwind::StaggeredIncompressibleSteadyFlow> pstar = solver.array();
+  red3::ArrayU<red3::upwind::StaggeredIncompressibleSteadyFlow> ustar = solver.uArray();
+  red3::ArrayV<red3::upwind::StaggeredIncompressibleSteadyFlow> vstar = solver.vArray();
 
   solver.setEastU([](double x) {return 4*x*(1.0 - x); });
   solver.setWestU([](double x) {return 4*x*(1.0 - x); });

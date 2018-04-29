@@ -13,6 +13,7 @@ set(SRCS array.cpp
          util.cpp)
 
 set(HDRS red3api.hpp
+         approxfrac.hpp
          array.hpp
          arrayops.hpp
          def.hpp
