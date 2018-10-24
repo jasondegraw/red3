@@ -23,19 +23,18 @@ TEST_CASE("Basic 2D Arrays", "[Array]")
   red3::StaggeredGrid grid(4, 5);
   red3::StaggeredGrid::ArrayU array(&grid);
   for(auto j = 0; j < grid.nj; j++) {
-    for(auto i = 0; i < grid.ni; i++) {
+    for(auto i = 0; i < grid.nu; i++) {
       array(i, j, 0) = i;
     }
   }
-  std::vector<double> v = { 0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0,
-    0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0,
-    0.0, 1.0, 2.0, 3.0 };
-  for(auto i = 0; i < 20; i++) {
+  std::vector<double> v = { 0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 1.0, 2.0, 3.0, 4.0,
+    0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 1.0, 2.0, 3.0, 4.0};
+  for(auto i = 0; i < 25; i++) {
     REQUIRE(v[i] == array[i]);
     array[i] = (double)i;
   }
   double value = 0.0;
-  for(auto i = 0; i < 20; i++) {
+  for(auto i = 0; i < 25; i++) {
     REQUIRE(value == array[i]);
     value += 1.0;
   }

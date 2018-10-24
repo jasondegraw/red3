@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="red3::ChildArray&lt;*&gt;">
+    <DisplayString>{{size = {m_parent->ni} * {m_parent->nj} * {m_parent->nk}}}</DisplayString>
+    <Expand>
+      <Item Name="[size]">m_parent->ni * m_parent->nj * m_parent->nk</Item>
+      <ArrayItems>
+        <Size>m_parent->ni * m_parent->nj * m_parent->nk</Size>
+        <ValuePointer>m_impl._Ptr</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+  <Type Name="red3::ChildArrayU&lt;*&gt;">
+    <DisplayString>{{size = {m_parent->nu} * {m_parent->nj} * {m_parent->nk}}}</DisplayString>
+    <Expand>
+      <Item Name="[size]">m_parent->nu * m_parent->nj * m_parent->nk</Item>
+      <ArrayItems>
+        <Size>m_parent->nu * m_parent->nj * m_parent->nk</Size>
+        <ValuePointer>m_impl._Ptr</ValuePointer>  
+      </ArrayItems>  
+    </Expand> 
+  </Type>
+  <Type Name="red3::ChildArrayV&lt;*&gt;">
+    <DisplayString>{{size = {m_parent->ni} * {m_parent->nv} * {m_parent->nk}}}</DisplayString>
+    <Expand>
+      <Item Name="[size]">m_parent->ni * m_parent->nv * m_parent->nk</Item>
+      <ArrayItems>
+        <Size>m_parent->ni * m_parent->nv * m_parent->nk</Size>
+        <ValuePointer>m_impl._Ptr</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+  <Type Name="red3::ChildArrayW&lt;*&gt;">
+    <DisplayString>{{size = {m_parent->ni} * {m_parent->nj} * {m_parent->nw}}}</DisplayString>
+    <Expand>
+      <Item Name="[size]">m_parent->ni * m_parent->nj * m_parent->nw</Item>
+      <ArrayItems>
+        <Size>m_parent->ni * m_parent->nj * m_parent->nw</Size>
+        <ValuePointer>m_impl._Ptr</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+</AutoVisualizer>

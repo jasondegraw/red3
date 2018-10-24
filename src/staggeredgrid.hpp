@@ -28,7 +28,7 @@
 namespace red3
 {
 
-class StaggeredGrid
+class RED3_API StaggeredGrid
 {
 public:
   using Array = ChildArray<StaggeredGrid>;

@@ -31,27 +31,27 @@ TEST_CASE("Basic 2D Upwinding", "[upwind]")
   // Check grid
   REQUIRE(5 == grid.x.size());
   std::vector<double> x = { 0.0, 0.25, 0.5, 0.75, 1.0 };
-  for(unsigned i = 0; i < grid.nu; i++) {
+  for(auto i = 0; i < grid.nu; i++) {
     REQUIRE(x[i] == grid.x[i]);
   }
   REQUIRE(4 == grid.xm.size());
   std::vector<double> xm = { 0.125, 0.375, 0.625, 0.875 };
-  for(unsigned i = 0; i < grid.ni; i++) {
+  for(auto i = 0; i < grid.ni; i++) {
     REQUIRE(xm[i] == grid.xm[i]);
   }
   REQUIRE(6 == grid.y.size());
   std::vector<double> y = { 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 };
-  for(unsigned i = 0; i < grid.nv; i++) {
+  for(auto i = 0; i < grid.nv; i++) {
     REQUIRE(y[i] == Approx(grid.y[i]));
   }
   REQUIRE(5 == grid.ym.size());
   std::vector<double> ym = { 0.1, 0.3, 0.5, 0.7, 0.9 };
-  for(unsigned i = 0; i < grid.ni; i++) {
+  for(auto i = 0; i < grid.ni; i++) {
     REQUIRE(ym[i] == Approx(grid.ym[i]));
   }
   // BC Setters
   grid.setNorthU([](double x){return 1.0;});
-  for(unsigned i = 0; i < grid.nu; i++) {
+  for(auto i = 0; i < grid.nu; i++) {
     REQUIRE(1.0 == grid.northU(i, 0)); // << ("Index: " + std::to_string(i));
   }
 
