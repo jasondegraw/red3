@@ -104,29 +104,29 @@ protected:
 };
 */
 
-template <class T> class Array
+template <class T> class ChildArray
 {
 public:
-  Array() : m_parent(nullptr)
+  ChildArray() : m_parent(nullptr)
   {}
-  Array(T *parent) : m_parent(parent)
+  ChildArray(T *parent) : m_parent(parent)
   {
     m_impl = std::shared_ptr<double>(new double[m_parent->ni*m_parent->nj*m_parent->nk], std::default_delete<double[]>());
   }
-  Array(const Array &other) : m_impl(other.m_impl), m_parent(other.m_parent)
+  ChildArray(const ChildArray &other) : m_impl(other.m_impl), m_parent(other.m_parent)
   {}
 
-  Array& operator=(const Array &other)
+  ChildArray& operator=(const ChildArray &other)
   {
     m_impl = other.m_impl;
     m_parent = other.m_parent;
     return *this;
   }
-  bool operator==(const Array &other) const
+  bool operator==(const ChildArray &other) const
   {
     return m_impl == other.m_impl;
   }
-  bool operator!=(const Array &other) const
+  bool operator!=(const ChildArray &other) const
   {
     return m_impl != other.m_impl;
   }
@@ -162,33 +162,33 @@ protected:
 
 };
 
-template <class T> class ArrayU
+template <class T> class ChildArrayU
 {
 public:
-  ArrayU() : m_parent(nullptr)
+  ChildArrayU() : m_parent(nullptr)
   {}
 
-  ArrayU(T *parent) : m_parent(parent)
+  ChildArrayU(T *parent) : m_parent(parent)
   {
     m_impl = std::shared_ptr<double>(new double[m_parent->nu*m_parent->nj*m_parent->nk], std::default_delete<double[]>());
   }
 
-  ArrayU(const ArrayU &other) : m_impl(other.m_impl), m_parent(other.m_parent)
+  ChildArrayU(const ChildArrayU &other) : m_impl(other.m_impl), m_parent(other.m_parent)
   {}
 
-  ArrayU& operator=(const ArrayU &other)
+  ChildArrayU& operator=(const ChildArrayU &other)
   {
     m_impl = other.m_impl;
     m_parent = other.m_parent;
     return *this;
   }
 
-  bool operator==(const ArrayU &other) const
+  bool operator==(const ChildArrayU &other) const
   {
     return m_impl == other.m_impl;
   }
 
-  bool operator!=(const ArrayU &other) const
+  bool operator!=(const ChildArrayU &other) const
   {
     return m_impl != other.m_impl;
   }
@@ -208,7 +208,7 @@ public:
     return (m_impl.get())[UINDEX(i, j, k, m_parent->nu, m_parent->nj, m_parent->nk)];
   }
 
-  inline double copy(ArrayU &other)
+  inline double copy(ChildArrayU &other)
   {
     int nijk = m_parent->nu * m_parent->nj * m_parent->nk;
 
@@ -230,31 +230,31 @@ protected:
 
 };
 
-template <class T> class ArrayUVW
+template <class T> class ChildArrayUVW
 {
 public:
-  ArrayUVW() : m_parent(nullptr), m_impl(nullptr)
+  ChildArrayUVW() : m_parent(nullptr), m_impl(nullptr)
   {}
-  ArrayUVW(T *parent) : m_parent(parent)
+  ChildArrayUVW(T *parent) : m_parent(parent)
   {
     m_impl = std::shared_ptr<double>(new double[m_parent->nu*m_parent->nv*m_parent->nw], std::default_delete<double[]>());
   }
-  ArrayUVW(const ArrayUVW &other) : m_impl(other.m_impl), m_parent(other.m_parent)
+  ChildArrayUVW(const ChildArrayUVW &other) : m_impl(other.m_impl), m_parent(other.m_parent)
   {}
 
-  ArrayUVW& operator=(const ArrayUVW &other)
+  ChildArrayUVW& operator=(const ChildArrayUVW &other)
   {
     m_impl = other.m_impl;
     m_parent = other.m_parent
     return *this;
   }
 
-  bool operator==(const ArrayUVW &other) const
+  bool operator==(const ChildArrayUVW &other) const
   {
     return m_impl == other.m_impl;
   }
 
-  bool operator!=(const ArrayUVW &other) const
+  bool operator!=(const ChildArrayUVW &other) const
   {
     return m_impl != other.m_impl;
   }
@@ -290,29 +290,29 @@ protected:
 
 };
 
-template <class T> class ArrayV
+template <class T> class ChildArrayV
 {
 public:
-  ArrayV() : m_parent(nullptr)
+  ChildArrayV() : m_parent(nullptr)
   {}
-  ArrayV(T *parent) : m_parent(parent)
+  ChildArrayV(T *parent) : m_parent(parent)
   {
     m_impl = std::shared_ptr<double>(new double[m_parent->ni*m_parent->nv*m_parent->nk], std::default_delete<double[]>());
   }
-  ArrayV(const ArrayV &other) : m_impl(other.m_impl), m_parent(other.m_parent)
+  ChildArrayV(const ChildArrayV &other) : m_impl(other.m_impl), m_parent(other.m_parent)
   {}
 
-  ArrayV& operator=(const ArrayV &other)
+  ChildArrayV& operator=(const ChildArrayV &other)
   {
     m_impl = other.m_impl;
     m_parent = other.m_parent;
     return *this;
   }
-  bool operator==(const ArrayV &other) const
+  bool operator==(const ChildArrayV &other) const
   {
     return m_impl == other.m_impl;
   }
-  bool operator!=(const ArrayV &other) const
+  bool operator!=(const ChildArrayV &other) const
   {
     return m_impl != other.m_impl;
   }
@@ -338,29 +338,29 @@ protected:
 
 };
 
-template <class T> class ArrayW
+template <class T> class ChildArrayW
 {
 public:
-  ArrayW() : m_parent(nullptr)
+  ChildArrayW() : m_parent(nullptr)
   {}
-  ArrayW(T *parent) : m_parent(parent)
+  ChildArrayW(T *parent) : m_parent(parent)
   {
     m_impl = std::shared_ptr<double>(new double[m_parent->ni*m_parent->nj*m_parent->nw], std::default_delete<double[]>());
   }
-  ArrayW(const ArrayW &other) : m_impl(other.m_impl), m_parent(other.m_parent)
+  ChildArrayW(const ChildArrayW &other) : m_impl(other.m_impl), m_parent(other.m_parent)
   {}
 
-  ArrayW& operator=(const ArrayW &other)
+  ChildArrayW& operator=(const ChildArrayW &other)
   {
     m_impl = other.m_impl;
     m_parent = other.m_parent;
     return *this;
   }
-  bool operator==(const ArrayW &other) const
+  bool operator==(const ChildArrayW &other) const
   {
     return m_impl == other.m_impl;
   }
-  bool operator!=(const ArrayW &other) const
+  bool operator!=(const ChildArrayW &other) const
   {
     return m_impl != other.m_impl;
   }

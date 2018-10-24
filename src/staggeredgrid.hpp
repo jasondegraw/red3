@@ -21,7 +21,6 @@
 #include <memory>
 
 #include "red3api.hpp"
-#include "arrayops.hpp"
 #include "array.hpp"
 #include "util.hpp"
 #include "grid.hpp"
@@ -29,10 +28,15 @@
 namespace red3
 {
 
-template <typename T> class BasicStaggeredGrid
+class StaggeredGrid
 {
 public:
-  BasicStaggeredGrid(int ni, int nj, int nk=1, bool xperi=false)
+  using Array = ChildArray<StaggeredGrid>;
+  using ArrayU = ChildArrayU<StaggeredGrid>;
+  using ArrayV = ChildArrayV<StaggeredGrid>;
+  using ArrayW = ChildArrayW<StaggeredGrid>;
+
+  StaggeredGrid(int ni, int nj, int nk=1, bool xperi=false)
     : ni(ni), nj(nj), nk(std::max(nk,1)), nu(ni + 1), nv(nj + 1), nw(nk == 1 ? 1 : nk + 1), xperi(xperi)
   {
     // Check the inputs
@@ -99,7 +103,7 @@ public:
     
   }
 
-  virtual ~BasicStaggeredGrid()
+  virtual ~StaggeredGrid()
   {}
 
   //inline double u(int i, int j, int k) { return m_u[UINDEX(i, j, k, nu, nj, nk)]; }
@@ -157,7 +161,7 @@ public:
     }
   }
 
-  void divg(Array<T> &g)
+  void divg(Array &g)
   {
     int i0 = 0, i1 = 0, j0 = 0, j1 = 0;
     for (int k = 0; k < nk; k++) {
@@ -195,7 +199,7 @@ public:
     }
   }
 
-  void divg(ArrayU<T> &u, ArrayV<T> &v, Array<T> &g)
+  void divg(ArrayU &u, ArrayV &v, Array &g)
   {
     int i0 = 0, i1 = 0, j0 = 0, j1 = 0;
     for (int j = 0; j < nj; j++) {
@@ -218,7 +222,7 @@ public:
   }
 
 
-  void divg(ArrayU<T> &u, ArrayV<T> &v, ArrayW<T> &w, Array<T> &g)
+  void divg(ArrayU &u, ArrayV &v, ArrayW &w, Array &g)
   {
     int i0 = 0, i1 = 0, j0 = 0, j1 = 0;
     for (int k = 0; k < nk; k++) {
@@ -256,7 +260,7 @@ public:
     }
   }
 
-  void dudx(Array<T> &g)
+  void dudx(Array &g)
   {
     int i0 = 0, i1 = 0;
     for (int k = 0; k < nk; k++) {
@@ -272,7 +276,7 @@ public:
     }
   }
 
-  void dvdy(Array<T> &g)
+  void dvdy(Array &g)
   {
     int j0 = 0, j1 = 0;
     for (int k = 0; k < nk; k++) {
@@ -381,20 +385,20 @@ public:
     }
   }
 
-  Array<T> array() {
-    return Array<T>(static_cast<T*>(this));
+  Array array() {
+    return Array(static_cast<StaggeredGrid*>(this));
   }
 
-  ArrayU<T> uArray() {
-    return ArrayU<T>(static_cast<T*>(this));
+  ArrayU uArray() {
+    return ArrayU(static_cast<StaggeredGrid*>(this));
   }
 
-  ArrayV<T> vArray() {
-    return ArrayV<T>(static_cast<T*>(this));
+  ArrayV vArray() {
+    return ArrayV(static_cast<StaggeredGrid*>(this));
   }
 
-  ArrayW<T> wArray() {
-    return ArrayW<T>(static_cast<T*>(this));
+  ArrayW wArray() {
+    return ArrayW(static_cast<StaggeredGrid*>(this));
   }
 
   double *allocateVariable();
@@ -428,10 +432,10 @@ public:
   std::vector<double> ym;
   std::vector<double> zm;
 
-  ArrayU<T> u;
-  ArrayV<T> v;
-  ArrayW<T> w;
-  Array<T> p;
+  ArrayU u;
+  ArrayV v;
+  ArrayW w;
+  Array p;
 
 protected:
   int m_nx;
@@ -469,13 +473,6 @@ protected:
 
 //private:
 //  bool allocateSolution();
-};
-
-class StaggeredGrid : public BasicStaggeredGrid<StaggeredGrid>
-{
-public:
-  StaggeredGrid(int ni, int nj, int nk=1, bool xperi=false) : BasicStaggeredGrid<StaggeredGrid>(ni, nj, nk, xperi)
-  {}
 };
 
 }
