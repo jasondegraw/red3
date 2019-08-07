@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2016 Jason W. DeGraw
+// Copyright (C) 2015-2019 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,56 +13,122 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#ifndef GRID_H
-#define GRID_H
+#ifndef RED3_GRID_HPP
+#define RED3_GRID_HPP
 
-#include "red3api.hpp"
+#include "red3.hpp"
 #include <vector>
 #include <memory>
+
+namespace red3 {
 
 class RED3_API Grid1D
 {
 public:
-  virtual ~Grid1D(){}
-  virtual std::vector<double> grid() = 0;
-  virtual std::vector<double> midgrid() = 0;
-  virtual double delta(unsigned i) const = 0;
-  virtual double delta0() const = 0;
-  virtual unsigned n() const = 0;
-};
+  enum class Generator {UniformN, UniformDelta};
 
-class RED3_API Uniform : public Grid1D
-{
-public:
-  Uniform(unsigned n, double L=1, bool lengthIsDelta=false);
-  virtual ~Uniform(){}
-  virtual std::vector<double> grid();
-  virtual std::vector<double> midgrid();
-  virtual std::vector<double> deltas()
+  Grid1D(index_t N);
+
+  virtual ~Grid1D(){}
+
+  std::vector<double> grid() const
   {
-    std::vector<double> d(m_n);
-    for(unsigned i = 0; i < m_n; i++) {
-      d[i] = m_dx;
-    }
-    return d;
+    return m_x;
   }
-  virtual double delta(unsigned) const
+
+  std::vector<double> midgrid() const
   {
-    return m_dx;
+    return m_xm;
   }
-  virtual double delta0() const
+
+  std::vector<double> deltas() const
   {
     return m_dx;
   }
-  virtual unsigned n() const
+
+  double &operator[](index_t i)
   {
-    return m_n;
+    return m_x[i];
   }
+
+  double &grid(index_t i)
+  {
+    return m_x[i];
+  }
+
+  double &midgrid(index_t i)
+  {
+    return m_x[i];
+  }
+
+  double &m(index_t i)
+  {
+    return m_x[i];
+  }
+
+  double &delta(index_t i)
+  {
+    return m_dx[i];
+  }
+
+  double &delta0()
+  {
+    return m_dx[0];
+  }
+
+  double &deltaN()
+  {
+    return m_dx.back();
+  }
+
+  double operator[](index_t i) const
+  {
+    return m_x[i];
+  }
+
+  double grid(index_t i) const
+  {
+    return m_x[i];
+  }
+
+  double midgrid(index_t i) const
+  {
+    return m_x[i];
+  }
+
+  double m(index_t i) const
+  {
+    return m_x[i];
+  }
+
+  double delta(index_t i) const
+  {
+    return m_dx[i];
+  }
+
+  double delta0() const
+  {
+    return m_dx[0];
+  }
+
+  double deltaN() const
+  {
+    return m_dx.back();
+  }
+
+  index_t size() const
+  {
+    return N;
+  }
+
+  const Generator generator;
+  const index_t N;
+  const bool uniform;
 
 private:
-  double m_L;
-  unsigned m_n;
-  double m_dx;
+  std::vector<double> m_x;
+  std::vector<double> m_xm;
+  std::vector<double> m_dx;
 };
 
 class RED3_API Grid2D
@@ -70,5 +136,7 @@ class RED3_API Grid2D
 public:
   Grid2D(std::unique_ptr<Grid1D> x, std::unique_ptr<Grid1D> y);
 };
+
+}
 
 #endif

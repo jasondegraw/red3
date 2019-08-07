@@ -35,20 +35,20 @@ TEST_CASE("Basic 2D", "[StaggerdGrid]")
   for(auto i = 0; i < grid.nu; i++) {
     REQUIRE(x[i] == grid.x[i]);
   }
-  REQUIRE(4 == grid.xm.size());
+  REQUIRE(4 == grid.x.midgrid().size());
   std::vector<double> xm = { 0.125, 0.375, 0.625, 0.875 };
   for(auto i = 0; i < grid.ni; i++) {
-    REQUIRE(xm[i] == grid.xm[i]);
+    REQUIRE(xm[i] == grid.x.m(i));
   }
   REQUIRE(6 == grid.y.size());
   std::vector<double> y = { 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 };
   for(auto i = 0; i < grid.nv; i++) {
     REQUIRE(y[i] == Approx(grid.y[i]));
   }
-  REQUIRE(5 == grid.ym.size());
+  REQUIRE(5 == grid.y.midgrid().size());
   std::vector<double> ym = { 0.1, 0.3, 0.5, 0.7, 0.9 };
   for(auto i = 0; i < grid.ni; i++) {
-    REQUIRE(ym[i] == Approx(grid.ym[i]));
+    REQUIRE(ym[i] == Approx(grid.y.m(i)));
   }
   // Check velocity
   grid.setU([](double x, double y){return x;});
@@ -65,7 +65,7 @@ TEST_CASE("Basic 2D", "[StaggerdGrid]")
   }
   // Divergence, etc.
   //red3::Array<red3::StaggeredGrid> g(&grid);
-  auto g = grid.array();
+  auto g = grid.pArray();
   grid.dudx(g);
   for(auto j = 0; j < grid.nj; j++) {
     for(auto i = 0; i < grid.ni; i++){

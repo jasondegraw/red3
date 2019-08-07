@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2016 Jason W. DeGraw
+// Copyright (C) 2015-2019 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#ifndef RED3_H
-#define RED3_H
+#ifndef RED3_HPP
+#define RED3_HPP
 
 #include "red3api.hpp"
-#include <vector>
-#include <memory>
-
+namespace red3 {
+using index_t = int;
+}
 
 
 #endif

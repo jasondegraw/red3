@@ -15,33 +15,23 @@
 //
 #include"grid.hpp"
 
-Uniform::Uniform(unsigned n, double L, bool lengthIsDelta)
+namespace red3 {
+
+Grid1D::Grid1D(index_t n) : generator(Generator::UniformN), N(n), uniform(true)
 {
-  m_n = n;
-  if(lengthIsDelta){
-    m_dx = L;
-    m_L = L*n;
-  } else {
-    m_L = L;
-    m_dx = L/(double)(n-1);
+  double d{ 1.0 / static_cast<double>(N - 1) };
+  m_dx.resize(N - 1);
+  m_x.resize(N);
+  m_xm.resize(N - 1);
+  m_x[0] = 0.0;
+  m_xm[0] = 0.5*d;
+  m_dx[0] = 0.0;
+  for (index_t i = 1; i < N - 1; ++i) {
+    m_dx[i] = d;
+    m_x[i] = m_x[i - 1] + d;
+    m_xm[i] = m_xm[i - 1] + d;
   }
+  m_x[N - 1] = 1.0;
 }
 
-std::vector<double> Uniform::grid()
-{
-  std::vector<double> g = {0.0};
-  for(unsigned i=1; i<m_n-1; i++) {
-    g.push_back(i*m_dx);
-  }
-  g.push_back(m_L);
-  return g;
-}
-
-std::vector<double> Uniform::midgrid()
-{
-  std::vector<double> g;
-  for(unsigned i=1; i<m_n; i++) {
-    g.push_back((i-0.5)*m_dx);
-  }
-  return g;
 }

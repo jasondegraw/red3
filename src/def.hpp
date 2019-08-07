@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2016 Jason W. DeGraw
+// Copyright (C) 2015-2019 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,8 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
+#ifndef RED3_DEF_HPP
+#define RED3_DEF_HPP
 
 namespace red3
 {
 enum class CellFace {North, South, East, West, Front, Back};
 }
+
+#endif

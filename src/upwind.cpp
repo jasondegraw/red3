@@ -52,15 +52,15 @@ void StaggeredIncompressibleSteadyFlow::setupU()
       int north1(south1 + 1);
 
       // Compute fluxes
-      double Fe = rho*0.5*(u(east) + u(ijk))*dy[j];
-      double Fw = rho*0.5*(u(ijk) + u(west))*dy[j];
-      double Fn = rho*0.5*(v(north1)*dx[i - 1] + v(north2)*dx[i]);
-      double Fs = rho*0.5*(v(south1)*dx[i - 1] + v(south2)*dx[i]);
+      double Fe = rho*0.5*(u[east] + u[ijk])*y.delta(j);
+      double Fw = rho*0.5*(u[ijk] + u[west])*y.delta(j);
+      double Fn = rho*0.5*(v[north1]*x.delta(i - 1) + v[north2]*x.delta(i));
+      double Fs = rho*0.5*(v[south1]*x.delta(i - 1) + v[south2]*x.delta(i));
 
-      double De = mu*dy[j] / dx[i];
-      double Dw = mu*dy[j] / dx[i - 1];
-      double Dn = mu*(dx[i - 1] + dx[i]) / (dy[j] + dy[j + 1]); // 0.5s cancel out
-      double Ds = mu*(dx[i - 1] + dx[i]) / (dy[j - 1] + dy[j]); // 0.5s cancel out
+      double De = mu*y.delta(j) / x.delta(i);
+      double Dw = mu*y.delta(j) / x.delta(i - 1);
+      double Dn = mu*(x.delta(i - 1) + x.delta(i)) / (y.delta(j) + y.delta(j + 1)); // 0.5s cancel out
+      double Ds = mu*(x.delta(i - 1) + x.delta(i)) / (y.delta(j - 1) + y.delta(j)); // 0.5s cancel out
 
       // Compute the coefficients
       ae[ijk] = De*A(std::abs(Fe / De)) + std::max(-Fe, 0.0);
@@ -77,9 +77,9 @@ void StaggeredIncompressibleSteadyFlow::setupU()
       as[ijk] /= ap;
 
       // Compute the forcing term
-      int p2(INDEX(i, j, k, ni, nj, nk));
-      int p1(p2 - 1);
-      b[ijk] = 2.0*(p(p1) - p(p2)) / (ap*(dx[i - 1] + dx[i]));
+      index_t p2{ INDEX(i, j, k, ni, nj, nk) };
+      index_t p1{ p2 - 1 };
+      b[ijk] = 2.0*(p[p1] - p[p2]) / (ap*(x.delta(i - 1) + x.delta(i)));
     }
   }
   // South boundary of block
@@ -116,17 +116,17 @@ void StaggeredIncompressibleSteadyFlow::setupU()
     int north1(south1 + 1);
 
     // Compute fluxes
-    double Fe = rho*0.5*(u(east) + u(ijk))*dy[j];
-    double Fw = rho*0.5*(u(ijk) + u(west))*dy[j];
-    double Fn = rho*0.5*(v(north1)*dx[i - 1] + v(north2)*dx[i]);
-    double Fs = rho*0.5*(v(south1)*dx[i - 1] + v(south2)*dx[i]);
+    double Fe = rho*0.5*(u[east] + u[ijk])*y.delta(j);
+    double Fw = rho*0.5*(u[ijk] + u[west])*y.delta(j);
+    double Fn = rho*0.5*(v[north1]*x.delta(i - 1) + v[north2]*x.delta(i));
+    double Fs = rho*0.5*(v[south1]*x.delta(i - 1) + v[south2]*x.delta(i));
 
-    double De = mu*dy[j] / dx[i];
-    double Dw = mu*dy[j] / dx[i - 1];
-    double Dn = mu*(dx[i - 1] + dx[i]) / (dy[j] + dy[j + 1]); // 0.5s cancel out
+    double De = mu*y.delta(j) / x.delta(i);
+    double Dw = mu*y.delta(j) / x.delta(i - 1);
+    double Dn = mu*(x.delta(i - 1) + x.delta(i)) / (y.delta(j) + y.delta(j + 1)); // 0.5s cancel out
     // The mirror cell is the same size as cell j, so dy[j-1] = dy[j]
     // Ds = mu*(dx[i - 1] + dx[i]) / (dy[j - 1] + dy[j]) = mu*(dx[i - 1] + dx[i]) / (dy[j] + dy[j])
-    double Ds = 0.5*mu*(dx[i - 1] + dx[i]) / dy[j]; // 2 0.5s cancel out, one remains
+    double Ds = 0.5*mu*(x.delta(i - 1) + x.delta(i)) / y.delta(j); // 2 0.5s cancel out, one remains
 
     // Compute the coefficients
     ae[ijk] = De*A(std::abs(Fe / De)) + std::max(-Fe, 0.0);
@@ -145,10 +145,10 @@ void StaggeredIncompressibleSteadyFlow::setupU()
     as[ijk] /= ap;
 
     // Compute the forcing term
-    int p2(INDEX(i, j, k, ni, nj, nk));
-    int p1(p2 - 1);
+    index_t p2{ INDEX(i, j, k, ni, nj, nk) };
+    index_t p1{ p2 - 1 };
     // Add the boundary u to the forcing term
-    b[ijk] = 2*(p(p1) - p(p2)) / (ap*(dx[i - 1] + dx[i])) + as[ijk]*2*southU(i, k);
+    b[ijk] = 2*(p[p1] - p[p2]) / (ap*(x.delta(i - 1) + x.delta(i))) + as[ijk]*2*southU(i, k);
 
   }
 
@@ -186,17 +186,17 @@ void StaggeredIncompressibleSteadyFlow::setupU()
     int north1(south1 + 1);
 
     // Compute fluxes
-    double Fe = rho*0.5*(u(east) + u(ijk))*dy[j];
-    double Fw = rho*0.5*(u(ijk) + u(west))*dy[j];
-    double Fn = rho*0.5*(v(north1)*dx[i - 1] + v(north2)*dx[i]);
-    double Fs = rho*0.5*(v(south1)*dx[i - 1] + v(south2)*dx[i]);
+    double Fe = rho*0.5*(u[east] + u[ijk])*y.delta(j);
+    double Fw = rho*0.5*(u[ijk] + u[west])*y.delta(j);
+    double Fn = rho*0.5*(v[north1]*x.delta(i - 1) + v[north2]*x.delta(i));
+    double Fs = rho*0.5*(v[south1]*x.delta(i - 1) + v[south2]*x.delta(i));
 
-    double De = mu*dy[j] / dx[i];
-    double Dw = mu*dy[j] / dx[i - 1];
+    double De = mu*y.delta(j) / x.delta(i);
+    double Dw = mu*y.delta(j) / x.delta(i - 1);
     // The mirror cell is the same size as cell j, so dy[j + 1] = dy[j]
     // Dn = mu*(dx[i - 1] + dx[i]) / (dy[j] + dy[j + 1]) = mu*(dx[i - 1] + dx[i]) / (dy[j] + dy[j])
-    double Dn = 0.5*mu*(dx[i - 1] + dx[i]) / dy[j]; // 2 0.5s cancel out, one remains
-    double Ds = mu*(dx[i - 1] + dx[i]) / (dy[j - 1] + dy[j]);  // 0.5s cancel out
+    double Dn = 0.5*mu*(x.delta(i - 1) + x.delta(i)) / y.delta(j); // 2 0.5s cancel out, one remains
+    double Ds = mu*(x.delta(i - 1) + x.delta(i)) / (y.delta(j - 1) + y.delta(j));  // 0.5s cancel out
 
     // Compute the coefficients
     ae[ijk] = De*A(std::abs(Fe / De)) + std::max(-Fe, 0.0);
@@ -215,10 +215,10 @@ void StaggeredIncompressibleSteadyFlow::setupU()
     as[ijk] /= ap;
 
     // Compute the forcing term
-    int p2(INDEX(i, j, k, ni, nj, nk));
-    int p1(p2 - 1);
+    index_t p2{ INDEX(i, j, k, ni, nj, nk) };
+    index_t p1{ p2 - 1 };
     // Add the boundary u to the forcing term
-    b[ijk] = 2*(p(p1) - p(p2)) / (ap*(dx[i - 1] + dx[i])) + as[ijk] * 2*northU(i, k);
+    b[ijk] = 2*(p[p1] - p[p2]) / (ap*(x.delta(i - 1) + x.delta(i))) + as[ijk] * 2*northU(i, k);
 
   }
 

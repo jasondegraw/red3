@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2017 Jason W. DeGraw
+// Copyright (C) 2015-2019 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#ifndef UPWIND_HPP
-#define UPWIND_HPP
+#ifndef RED3_UPWIND_HPP
+#define RED3_UPWIND_HPP
 #include "staggeredgrid.hpp"
 #include "array.hpp"
 #include <functional>
@@ -24,12 +24,14 @@
 namespace red3 {
 namespace upwind {
 
+enum class Differencing { FirstOrder, Hybrid, PowerLaw, Central };
+
 class RED3_API StaggeredIncompressibleSteadyFlow : public StaggeredGrid
 {
 public:
   enum class BoundaryCondition {  };
-  enum class Differencing { FirstOrder, Hybrid, PowerLaw, Central };
-  StaggeredIncompressibleSteadyFlow(double rho, double mu, unsigned ni, unsigned nj, unsigned nk = 1, 
+
+  StaggeredIncompressibleSteadyFlow(double rho, double mu, index_t ni, index_t nj, index_t nk = 1,
     Differencing diff = Differencing::FirstOrder, bool xperi = false) : StaggeredGrid(ni, nj, nk, xperi), differencing(diff),
     ae(this), aw(this), an(this), as(this), af(this), ab(this), b(this), rho(rho), mu(mu)
   {

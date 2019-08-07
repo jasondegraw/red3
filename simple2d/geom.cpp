@@ -20,14 +20,14 @@
 int main(int argc, char *argv[])
 {
   red3::upwind::StaggeredIncompressibleSteadyFlow solver(100.0, 1.0, 9, 9);
-  auto pstar = solver.array();
+  auto pstar = solver.pArray();
   auto ustar = solver.uArray();
   auto vstar = solver.vArray();
 
   solver.setEastU([](double x) {return 4*x*(1.0 - x); });
   solver.setWestU([](double x) {return 4*x*(1.0 - x); });
   for (int j = 0; j < solver.nj; j++) {
-    std::cout << solver.xm[j] << ' ' << solver.u(0, j, 0) << ' ' << solver.u(solver.ni, j, 0) << std::endl;
+    std::cout << solver.x.m(j) << ' ' << solver.u(0, j, 0) << ' ' << solver.u(solver.ni, j, 0) << std::endl;
   }
 
   std::cout << solver.ni << ' ' << solver.nj << ' ' << solver.nk << std::endl;
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
   solver.setupU();
 
   for (int j = 0; j < solver.nj; j++) {
-    std::cout << j << ' ' << solver.xm[j] << ' ' << solver.eastU(j, 0) << std::endl; // ' ' << solver.u(solver.ni, j, 0) << std::endl;
+    std::cout << j << ' ' << solver.x.m(j) << ' ' << solver.eastU(j, 0) << std::endl; // ' ' << solver.u(solver.ni, j, 0) << std::endl;
   }
 
   //auto us = solver.uArray();

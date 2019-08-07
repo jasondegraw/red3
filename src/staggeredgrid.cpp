@@ -22,6 +22,46 @@
 namespace red3
 {
 
+  StaggeredGrid::StaggeredGrid(index_t ni, index_t nj, index_t nk, bool xperi)
+    : ni(ni), nj(nj), nk(std::max(nk, 1)), nu(ni + 1), nv(nj + 1), nw(nk == 1 ? 1 : nk + 1), xperi(xperi),
+    two_dimensional(nk == 1), x(nu), y(nv), z(nw), nnu(nu*nj*nk), nnv(ni*nv*nk), nnw(ni*nj*nw), ncells(ni*nj*nk), bfx(0.0), bfy(0.0), bfz(0.0)
+  {
+    // Check the inputs
+    if (ni < 2) {
+      fatal("ni must be greater than 1");
+    }
+    if (nj < 2) {
+      fatal("nj must be greater than 1");
+    }
+
+    int nuvw = ni + nj + 2;
+    if (nk > 1) {
+      w = wArray();
+    }
+    u = uArray();
+    v = vArray();
+    p = pArray();
+
+    m_u_n = (double*)callocate(ni*nk, sizeof(double), "north u velocity");
+    m_u_s = (double*)callocate(ni*nk, sizeof(double), "south u velocity");
+
+    // Assume a simple grid
+    double rdx = 1.0 / x.delta0();
+    //m_rdx = std::vector<double>(xg.n(), rdx);
+    double rdy = 1.0 / y.delta0();
+    //m_rdy = std::vector<double>(yg.n(), rdy);
+    if (nk > 1) {
+      double rdz = 1.0 / z.delta0();
+      //m_rdz = std::vector<double>(zg.n(), rdz);
+    } //else {
+      //z = { -0.5, 0.5 };
+      //zm = { 0.0 };
+      //dz = { 1.0 };
+      //m_rdz = { 1.0 };
+    //}
+
+  }
+
   /*
 
 StaggeredGrid::StaggeredGrid(int ni, int nj, int nk, bool xperi)

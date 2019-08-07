@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2016 Jason W. DeGraw
+// Copyright (C) 2015-2019 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#ifndef UTIL_HPP
-#define UTIL_HPP
+#ifndef RED3_UTIL_HPP
+#define RED3_UTIL_HPP
 #include <string>
 #include "red3api.hpp"
 
