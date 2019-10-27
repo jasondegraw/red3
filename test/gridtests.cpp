@@ -13,13 +13,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#ifndef RED3_HPP
-#define RED3_HPP
+#include "catch.hpp"
 
-#include "red3api.hpp"
-namespace red3 {
-using index_t = size_t;
+#include "grid.hpp"
+
+TEST_CASE("Uniform Grid 1D", "[grid]")
+{
+  red3::Uniform1D x(0.25, 4);
+  REQUIRE(5 == x.size());
+  REQUIRE(0.25 == x.delta(0));
+  // Check grid
+  REQUIRE(0.0 == x[0]);
+  REQUIRE(0.25 == x[1]);
+  REQUIRE(0.5 == x[2]);
+  REQUIRE(0.75 == x[3]);
+  REQUIRE(1.0 == x[4]);
+
+  red3::Uniform1D y(4, 1.0);
+  REQUIRE(5 == y.size());
+  REQUIRE(0.25 == y.delta(0));
+  // Check grid
+  REQUIRE(0.0 == y[0]);
+  REQUIRE(0.25 == y[1]);
+  REQUIRE(0.5 == y[2]);
+  REQUIRE(0.75 == y[3]);
+  REQUIRE(1.0 == y[4]);
 }
 
-
-#endif

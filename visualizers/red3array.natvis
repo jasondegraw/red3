@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">  
+  <Type Name="red3::StaggeredGrid::ArrayU">
+    <DisplayString>{{size = 10}}</DisplayString>  
+    <Expand>  
+      <Item Name="[size]">10</Item>    
+      <!--ArrayItems>  
+        <Size>$i</Size>  
+        <ValuePointer>m_impl</ValuePointer>  
+      </ArrayItems-->  
+    </Expand> 
+  </Type>  
+</AutoVisualizer>

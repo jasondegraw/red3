@@ -4,6 +4,7 @@ enable_testing(true)
 
 set(SRCS approxfractests.cpp
          arraytests.cpp
+         gridtests.cpp
          staggeredgridtests.cpp
          upwindtests.cpp
          utilitiestests.cpp

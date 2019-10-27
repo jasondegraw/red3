@@ -1,0 +1,526 @@
+\documentclass[10pt]{article}
+\usepackage{amsmath}
+\usepackage{mathptmx}
+\usepackage{graphicx,color}
+\usepackage[margin=1in]{geometry}
+\usepackage[all]{xy}
+\usepackage{nameref}
+\usepackage[colorlinks=true,linkcolor=linkblue]{hyperref}
+\definecolor{linkblue}{rgb}{0,0,1}
+%
+% Local macros
+%
+\newcommand{\eqn}[1]{Equation~\ref{#1}}
+\newcommand{\reynum}{\ensuremath{\operatorname{Re}}}
+\newcommand{\NS}{\hbox{Navier}-\hbox{Stokes}\ }
+%
+% Linking macros - all the autorefs/namerefs below need to be *'ed (as
+%                  soon as I can use the newest hyperref version)
+%
+\newcommand{\batref}[1]{
+\hyperref[#1]{\autoref{#1}}}
+%
+\newcommand{\batrefp}[1]{
+\hyperref[#1]{\autoref{#1} 
+(on page~\pageref*{#1})}}
+%
+\newcommand{\batrefn}[1]{
+\hyperref[#1]{\autoref{#1} 
+(\nameref{#1})}}
+\newcommand{\batrefnp}[1]{
+\hyperref[#1]{\autoref{#1} 
+(\nameref{#1}, on page~\pageref*{#1})}}
+%
+\newcommand{\batrefo}[1]{
+\hyperref[#1]{See section~\ref*{#1} 
+(on page~\pageref*{#1})}}
+%
+% Change section to Section
+%
+\renewcommand{\sectionautorefname}{Section}
+%
+%
+%
+\title{RED3 Manual}
+\author{Jason W. DeGraw}
+\date{\today}
+\begin{document}
+\maketitle
+\tableofcontents
+%
+\section{Introduction}
+RED3 is an implementation in C++ of the staggered-grid fluid simulation
+methodology.  It owes a great deal to the approximately factored
+approach of Kim and Moin \cite{kim_moin85}.
+%
+\section{Governing Equations}
+This section outlines the governing equations used in the solution process.
+\subsection{Conservation of Mass}
+The general expression for differential conservation of mass is
+\begin{equation}\label{general_continuity}
+\frac{\partial\rho}{\partial t} + \frac{\partial}{\partial x_j}
+\left(\rho u_j\right) = 0.
+\end{equation}
+If the density $\rho$ is constant or approximately constant, then the flow is
+termed incompressible and \eqn{general_continuity} reduces to
+\begin{equation}\label{incompressible_continuity}
+\frac{\partial u_j}{\partial x_j}=0.
+\end{equation}
+%
+\subsection{Conservation of Momentum}
+\begin{equation}\label{general_navier_stokes}
+\frac{\partial}{\partial t}\left(\rho u_i\right)  + \frac{\partial}{\partial x_j}
+\left(\rho u_ju_i\right) = -\frac{\partial p}{\partial x_i}
+ + \frac{\partial}{\partial x_j}\left(\mu\frac{\partial u_i}{\partial x_j}\right)
+ + f_i.
+\end{equation}
+%
+\section{Approximate Factorization Method}\label{fracstep} The
+numerical solution method used for the LES is an approximately
+factored finite difference method developed by Kim and Moin
+\cite{kim_moin85} in which the flow field is represented on a
+staggered grid.  The method preserves conservation of momentum,
+energy, and mass to machine precision.  The viscous terms are
+spatially second-order central differenced.  The second-order temporal
+treatment is Adams-Bashforth for the convective term and
+Crank-Nicolson for the viscous term.  This method has been
+successfully used for various flows by many researchers.
+
+The incompressible \NS equations in cartesian coordinates are
+\begin{equation}\label{iNS}
+\frac{\partial u_i}{\partial t} + \frac{\partial}{\partial x_j}
+\left(u_i u_j\right) = -\frac{\partial p}{\partial x_i} 
++ \frac{1}{\reynum}\frac{\partial^2 u_i}{\partial x_j \partial x_j}
+\end{equation}
+The time derivative in the \NS equations is second-order central
+differenced about $n+1/2$ as
+\begin{equation}
+\frac{\partial u_i}{\partial t}\approx \frac{u_i^{n+1}-u_i^n}{\Delta t},
+\end{equation}
+where the superscript denotes timestep and $\Delta t$ is the timestep
+size.  We represent the convective term by first defining
+\begin{equation}
+H_i^n = -\delta_i (u_i^n u_j^n),
+\end{equation}
+where $\delta_i$ is the $i$ direction finite difference operator.  The
+convective term is calculated explicitly using an Adams-Bashforth
+method:
+\begin{equation}
+\frac{\partial}{\partial x_i}(u_i u_j) 
+\approx -\frac{1}{2}(3H_i^n - H_i^{n-1}).
+\end{equation}
+The viscous term is approximated implicitly using the Crank-Nicolson
+method:
+\begin{equation}
+\frac{1}{Re}\frac{\partial^2 u_i}{\partial x_j \partial x_j}\approx
+\frac{1}{2}\frac{1}{Re}(\delta_1^2+\delta_2^2+\delta_3^2)(u_i^{n+1}+u_i^n).
+\end{equation}
+Substituting these expressions into \autoref{iNS}, we have the
+approximation
+\begin{equation}\label{sdNS}
+\frac{u_i^{n+1}-u_i^n}{\Delta t}= \frac{1}{2}(3H_i^n - H_i^{n-1})
+	-\frac{\partial p}{\partial x_i}+
+  \frac{1}{2}\frac{1}{Re}\left(\delta_1^2+\delta_2^2+\delta_3^2\right)
+  \left(u_i^{n+1}+u_i^n\right).
+\end{equation}
+The velocity at the next timestep is decomposed into two components:
+\begin{equation}\label{afdecomp}
+u_i^{n+1}=\hat{u}_i + \Delta u_i.
+\end{equation}
+Substituting \autoref{afdecomp} into \autoref{sdNS} we obtain two
+equations:
+\begin{equation}\label{uhat}
+\frac{\hat{u}_i-u_i^n}{\Delta t} = \frac{1}{2}(3H_i^n - H_i^{n-1})
+  +\frac{1}{2}\frac{1}{Re}\left(\delta_1^2+\delta_2^2+\delta_3^2\right)
+  \left(\hat{u}_i+u_i^n\right)
+\end{equation}
+and
+\begin{equation}\label{Deltau}
+\frac{\Delta u_i}{\Delta t}=-\frac{\partial p}{\partial x_i}+
+  \frac{1}{2}\frac{1}{Re}\left(\delta_1^2+\delta_2^2+\delta_3^2\right)
+  \Delta u_i.
+\end{equation}
+Splitting the equations in this manner defines the decomposition given
+in \autoref{afdecomp}.  This is not the only such decomposition, but
+this one is desirable because it constrains $\hat{u}_i$ to satisfy a
+momentum-like equation that does not involve pressure.
+\autoref{uhat} is rewritten as
+\begin{equation}
+(1-A_1-A_2-A_3)(\hat{u}_i-u_i^n)=\frac{\Delta t}{2}(3H_i^n - H_i^{n-1})
++2(A_1+A_2+A_3)u_i^n,
+\end{equation}
+where $A_i=(\Delta t / 2)\delta_i^2$.  Examining the left hand side,
+we see that
+\begin{equation}
+1-A_1-A_2-A_3=(1-A_1)(1-A_2)(1-A_3)-A_1A_2-A_1A_3-A_2A_3+A_1A_2A_3.
+\end{equation}
+Neglecting all products of $A_i$'s, we have the approximately factored
+momentum-like equation
+\begin{equation}\label{afmom}
+(1-A_1)(1-A_2)(1-A_3)(\hat{u}_i-u_i^n)=\frac{\Delta t}{2}(3H_i^n - H_i^{n-1})
++2(A_1+A_2+A_3)u_i^n.
+\end{equation}
+\autoref{afmom} is easier to solve than \autoref{uhat} since
+it only requires the inversion of tridiagonal matrices.
+
+We now define a pressure-like scalar function $\phi$ such that 
+\begin{equation}\label{phidef}
+\frac{\Delta u_i}{\Delta t}=\frac{\partial \phi}{\partial x_i}.
+\end{equation}
+Since $u_i^{n+1}$ must satisfy the continuity equation, we have
+\begin{equation}\label{decompdiv}
+\frac{\partial \hat{u}_j}{\partial x_j}
+=-\frac{\partial}{\partial x_j}\Delta u_j.
+\end{equation}
+Combining Equations~\ref{phidef} and \ref{decompdiv} we have
+\begin{equation}\label{phipoisson}
+\frac{\partial \hat{u}_j}{\partial x_j}=\Delta t\frac{\partial^2 \phi}{\partial x_j \partial x_j}.
+\end{equation}
+This equation is a Poisson equation for $\phi$ which may may be solved
+by a variety of methods.  We use a Fourier cosine transform method.
+We solve for $\phi$ of form
+\begin{equation}
+\phi(i,j,k)=\sum^{N_x-1}_{l=0}\ \sum^{N_z-1}_{m=0} \tilde{\phi}(l,j,m)
+\cos \left[\frac{\pi l}{N_x}\left(i+\frac{1}{2}\right)\right]
+\cos \left[\frac{\pi m}{N_z}\left(k+\frac{1}{2}\right)\right],
+\end{equation}
+where $i=0,\dots ,N_x-1$, $j=0,\dots ,N_y-1$, $k=0,\dots ,N_z-1$, and $l$
+and $m$ are the wave numbers.  Substituting this into
+\autoref{phipoisson}, we obtain
+\begin{equation}\label{phieq}
+\delta_2^2 \tilde{\phi} - k'_l\tilde{\phi} -
+k'_m\tilde{\phi}=\tilde{Q}(l,j,m),
+\end{equation}
+where $\tilde{Q}$ is the Fourier transform of $Q=\Delta
+t\frac{\partial^2 \phi}{\partial x_j \partial x_j}$, and $k'_l$ and
+$k'_m$ are the modified wave numbers defined as
+\begin{equation}
+k'_l=\frac{2}{\Delta x^2}\cos \left(\frac{\pi l}{N_x}\right)
+\hbox{\ \ and\ \ }
+k'_l=\frac{2}{\Delta z^2}\cos \left(\frac{\pi m}{N_z}\right).
+\end{equation}
+This equation results in a tridiagonal system of equations, which may
+be easily solved. We need only perform an inverse Fourier transform to
+find $\phi$.  
+
+We are now able to advance the solution process in time.
+%(provided that boundary conditions are correctly applied , see
+%Section~\ref{bc}).  
+Given $u_i^n$, we solve \autoref{afmom} for $\hat{u}_i$.  We then
+may solve \autoref{phieq} for $\phi$, which in turn allows us to
+find $\Delta u_i$ via \autoref{phidef}.  Then we have $u_i^{n+1}$
+(\autoref{afdecomp}).  To compute the pressure, which is not
+required for this algorithm, we combine Equations~\ref{Deltau} and
+\ref{phidef} to obtain (after one integration)
+\begin{equation}
+p=\phi-\frac{\Delta t}{2}\frac{1}{Re}
+\left(\delta_1^2+\delta_2^2+\delta_3^2\right)\phi.
+\end{equation}
+%Thus, once we know $\phi$ it is easy to calculate $p$.
+
+\section{Boundary Conditions}\label{bc}
+For the velocities, we use periodic conditions in the $x$ and $z$
+directions.  In the the $z$ direction, this is accomplished by
+identifying the indices of the solution matrices with one another on
+the $z$ boundaries.  The $x$ direction implementation is slightly more
+complicated, as the current implementation requires a mass flux to
+drive the flow.  The mass flux is established by the initial
+condition, it must be maintained by the solution procedure.  This is
+accomplished by computing the intermediate flow as if it were under
+inflow/outflow conditions, with a specified inflow at $i=1$.  When we
+impose the divergence-free condition, we copy the ``outflow'' over the
+``inflow'' and account for any differences, thus maintaining mass
+flux.
+
+%We also must specify boundary conditions for the intermediate velocity
+%$\hat{u}_i$.  Appropriate conditions may be generated by considering
+%$\hat{u}_i$ to be an approximation to $u_i^{\star}$, which we define
+%to be a continuous function such that
+%\begin{eqnarray}
+%\frac{\partial u_i^{\star}}{\partial t} &=&H_i^\star+\frac{1}{Re}
+%\frac{\partial}{\partial x_j}\frac{\partial}{\partial x_j}u_i^\star\\
+%\noalign{\hbox{that agrees with $u_i$ at each timestep}\nonumber}
+%u_i^{\star}(x_i,n\Delta t)&=&u_i(x_i,n\Delta t),
+%\end{eqnarray}
+%where $n$ is the number of timesteps taken and $\Delta t$ is the
+%timestep size.  Then, expanding $u_i^{\star}$ as a Taylor series in
+%time at the $(n+1)$st step:
+%\begin{eqnarray*}
+%\hat{u}_i &\approx& u_i^{\star}(x_i,[n+1]\Delta t)\\
+%&=&u_i^{\star}(x_i,n\Delta t)+\Delta t\frac{\partial
+%u_i^{\star}}{\partial t}
+%+\frac{1}{2}\Delta t^2 \frac{\partial^2 u _i^{\star}}{\partial t^2}+\dots\\
+%&=&u_i^{\star}(x_i,n\Delta t)+\Delta t\left(H_i^\star+\frac{1}{Re}
+%\frac{\partial}{\partial x_j}\frac{\partial}{\partial
+%x_j}u_i^\star\right)
+%+\dots
+%\end{eqnarray*}
+%Since $u_i^{\star}(x_i,n\Delta t)=u_i(x_i,n\Delta t)$ and a
+%rearrangement of the \NS equations gives
+%\begin{equation}
+%\frac{\partial u_i}{\partial t}+\frac{\partial p}{\partial x_i}=
+%H_i+\frac{1}{Re}
+%\frac{\partial}{\partial x_j}\frac{\partial}{\partial x_j}u_i,
+%\end{equation}
+%$\hat{u}_i$ is no given by 
+%\begin{eqnarray}
+%\hat{u}_i &\approx&u_i(x_i,n\Delta t)+\Delta t\left(\frac{\partial u_i}
+%{\partial t}+\frac{\partial p}{\partial x_i}\right)
+%+\dots\nonumber\\
+%\hat{u}_i &\approx&u_i(x_i,[n+1]\Delta t)+\Delta t\frac{\partial
+%p}{\partial x_i}+ \label{uhatbc}\dots
+%\end{eqnarray}
+%Keeping the first two terms of Equation~\ref{uhatbc} gives us an
+%appropriate boundary condition for $\hat{u}_i$.
+
+\section{Computational Grid}\label{grid}
+%
+%\staggridfig
+% 
+The numerical formulation employs a staggered grid, of which one grid cell is shown in Figure~\ref{staggrid}.  The physical locations where quantities are calculated are given in Table~\ref{gridtbl}.  
+%Note that in Figure~\ref{staggrid} the pressure node is at the center
+%of the cell.  
+%\renewcommand\arraystretch{2}
+\begin{table}[p]
+\begin{center}
+\caption{Node Locations.}
+\label{gridtbl}
+\begin{tabular}{|c|c|}\hline
+\textit{Quantity} & \textit{Location}\\ \hline %&\textit{Index Range}\\ \hline 
+$u(i,j,k)$  & $\left((x(i),y_m(j),z(k)\right)$   \\ \hline
+%& $i=1\dots i_{max}$, $j=1\dots j_{max}+1$, and $k=1\dots k_{max}$ \\ \hline
+$v(i,j,k)$  & $\left(x(i)-\frac{\Delta_1}{2},y(j), z(k)\right)$ \\ \hline
+%& $i=1\dots i_{max}$, $j=1\dots j_{max}$, and $k=1\dots k_{max}$ \\ \hline
+$w(i,j,k)$&$\left((x(i)-\frac{\Delta_1}{2},y_m(j),z(k)+\frac{\Delta_3}{2}\right)$ \\ \hline
+%& $i=1\dots i_{max}$, $j=1\dots j_{max}+1$, and $k=1\dots k_{max}$ \\ \hline
+$p(i,j,k)$  & $\left(x(i)-\frac{\Delta_1}{2},y_m(j),z(k)+\frac{\Delta_3}{2}\right)$ \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+%\label{gridsection}
+%\input{grid}
+In all simulations, we use uniform grid spacing in the $x$ and $z$
+directions, with grid spacings $\Delta_1$ and $\Delta_3$,
+respectively.  In the $y$ direction, we use a stretched grid created
+using the hyperbolic tangent approach described in
+Section~\ref{gridsection}.  The $y$ location of the $j$th $v$ velocity
+point is denoted by $y(j)$.  The $u$ and $w$ points are located midway
+between successive $v$ gridpoints, so we denote their $y$ locations by
+$y_m(j)$:
+\begin{equation}
+y_m(j)=\frac{y(j)+y(j-1)}{2}\ \ \hbox{ for }j\in[2,\hbox{jmax}],
+\end{equation}
+where jmax is the number of $v$ gridpoints.  For convenience,
+$y_m(1)=-1$.  We first determine the $y$ direction grid for $v$ using
+\autoref{gridtanh}, and then the $y$ direction grid for $u$ (and
+$w$) is calculated.
+%
+%The $v$ grid is defined by
+%\begin{equation}
+%y(j)=\frac{\tanh (\xi_j \theta )}{\tanh (\theta )},
+%\end{equation}
+%where $\theta$ is a constant and $\xi_j$ is defined as
+%\begin{equation}
+%\xi_j=\frac{j-N_h}{N_h-1},
+%\end{equation}
+
+\section{Differencing Formulas}
+An important part of the implementation is the definition of the
+proper differencing formulas.  The basic derivative approach is to
+build higher order derivatives out of lower order ones:
+\begin{equation}
+\delta_i^2 \psi = \delta_i\left(\delta_i \psi\right)
+\end{equation}
+In terms of the discretization depicted in \autoref{diffschem}, this
+is written as
+\begin{equation}
+\delta_i^2 \psi = \frac{\delta_i \psi|_{O^+}-\delta_i
+\psi|_{\text{O}^-}}{d_3} 
+= \frac{\psi_\text{E}-\psi_\text{O}}{d_1d_3}  
+ -\frac{\psi_\text{O}-\psi_\text{W}}{d_2d_3}
+= \frac{1}{d_1d_3}\psi_\text{E} - \frac{d_1+d_2}{d_1d_2d_3}\psi_\text{O}
+ +\frac{1}{d_2d_3}\psi_\text{W}
+\end{equation}\
+For uniform spacings, this reduces to the standard second-order
+difference formula.
+
+\begin{figure}
+%\begin{center}
+%\begin{xy}
+\[
+\xy
+(0,0)*{}; (40,0)*{} **\dir{-};
+(0,0)*{\bullet}+(0,2)*{\psi_\text{W}};
+(20,0)*{\bullet}+(0,2)*{\psi_\text{O}};
+(40,0)*{\bullet}+(0,2)*{\psi_\text{E}};
+(9,-1)*{}; (11,1)*{} **\dir{-};
+(11,-1)*{}; (9,1)*{} **\dir{-};
+(29,-1)*{}; (31,1)*{} **\dir{-};
+(31,-1)*{}; (29,1)*{} **\dir{-};
+(0,-2)*{}; (0,-12)*{} **\dir{-};
+(20,-2)*{}; (20,-12)*{} **\dir{-};
+{\ar@{<->}|{d_2} (0,-7)*{};(20,-7)*{}}; 
+(40,-2)*{}; (40,-12)*{} **\dir{-};
+{\ar@{<->}|{d_1} (20,-7)*{};(40,-7)*{}}; 
+(10,2)*{}; (10,12)*{} **\dir{-};
+(30,2)*{}; (30,12)*{} **\dir{-};
+{\ar@{<->}|{d_3} (10,7)*{};(30,7)*{}};
+(11,-3)*{\text{O}^-};
+(31,-3)*{\text{O}^+};
+\endxy
+\]
+%\end{xy}
+%\end{center}
+\caption{Differencing Schematic}\label{diffschem}
+\end{figure}
+
+\section{Storage Scheme}
+The current version utilizes a single array approach for storing the
+solution varibles.  All velocites are stored in a single array, as is
+pressure.  The data structure is 
+\begin{verbatim}
+typedef struct {
+  int nx;            /* Number of x-direction cells */
+  int ny;            /* Number of y-direction cells */
+  int nz;            /* Number of z-direction cells */
+  real_t xl,yl,zl;   /* x-, y-, and z-direction dimensions (size)*/
+  int dim;           /* Dimension of solution (2 or 3) */
+  int ncell;         /* Total number of cells */
+  int nu,nv,nw;      /* Number of xi-direction velocity entries */
+  int nuvw;          /* Total number of velocity entries */
+  real_t *x,*y,*z;   /* Grid spacings */
+  real_t *u,*v,*w;   /* Velocity "arrays" - v and w are faked */
+  real_t *p;         /* Pressure array */
+  int iv,iw;         /* Shifts in the solution array to get v and w */
+  int nsa;           /* Total length of solution array */
+} strz_t;
+\end{verbatim}
+
+\section{Validation}\label{approxfactval}
+To validate the method, we have performed a laminar channel simulation
+at low Reynolds number.  In the case of fully developed laminar
+channel flow, the \NS equations can be analytically solved, resulting
+in a parabolic velocity profile.  The computational domain was
+$8\times 2 \times 2$, with a $65\times 65 \times 32$ grid (uniformly
+spaced in the $x$ and $z$ directions).  The $y$ direction is
+determined as described in Section~\ref{lesgrid}, with the parameters
+as in \autoref{lesgridtbl}.  We find that we are able to start from
+varying initial conditions and the result is a nicely parabolic
+profile. We present here a result that was started with a trapezoidal
+$u$ profile everywhere (and $v=w=0$).  The simulation was run at
+$Re=1000$ with a timestep of $\Delta t=0.02$.  After 400 time units,
+the solution is a nearly parabolic profile, as shown in
+Figure~\ref{lam}.
+%\lamfig
+%
+\begin{table}[t]
+\caption{Validation Grid Parameters.}\label{lesgridtbl}
+\begin{center}
+\begin{tabular}{|c|c|}\hline
+Parameter  & Value\\ \hline
+$y(2)$ & $-9.9965\times 10^{-1}$ \\ \hline 
+$\theta$ & $-3.5644$\\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\section{LES Implementation}
+%
+The implementation of the LES model in our numerical scheme is
+straightforward.  We use an implicit box filter, which uses the finite
+difference grid as the filter.  We need not modify the underlying
+numerical procedure and we only need to add an eddy viscosity
+computation.  The $\tau_{ij}$ term is calculated and advanced in the
+same manner that the convective term is advanced.
+
+\section{Spectralish Possion Solution}
+
+The solution of the Poisson equation on uniform grids is desired that
+will be faster than the typical finite difference solution.  Such a
+solution procedure can be developed using the Fourier transform.  We
+will provide details in one dimension, and the extension to two and
+three dimensions is straightforward.  For $\phi$ subject to the
+one-dimensional Poisson equation
+\begin{equation}\label{onedpoission}
+\frac{\partial^2\phi}{\partial x^2} = f
+\end{equation}
+we look for solutions of form 
+\begin{equation}\label{psiform}
+\phi(i)=\sum^{N_x-1}_{l=0} \tilde{\phi}(l)\psi(i,l)
+%\cos \left[\frac{\pi l}{N_x}\left(i+\frac{1}{2}\right)\right]
+\end{equation}
+for $i=0,1,\ldots,N_x-1$, where $\psi(i,l)$ are basis functions.  The
+grid is uniform with
+\begin{equation}
+x(i)=\left(i+\frac{1}{2}\right)\Delta x
+\end{equation}
+which places each $\phi(i)$ at the center of an interval $\Delta x$ in
+length.  Substituting \autoref{psiform} into \autoref{onedpoission},
+multiplying by weight functions $w(i,m)$ and integrating over the
+domain, we obtain the Galerkin weak form
+\begin{equation}\label{weakform}
+\int \left(\frac{\partial^2}{\partial x^2}\sum^{N_x-1}_{l=0} \tilde{\phi}(l)\psi(i,l) - 
+           \sum^{N_x-1}_{l=0} \tilde{f}(l)\psi(i,l)\right)w(i,m)dx=0.
+\end{equation}
+Assuming that the basis functions and the weight functions are
+orthogonal, and that the differentiation can be reinterpreted in terms
+of a modified wavenumber expression $k^{**}$, \autoref{weakform} can
+be rewritten as
+\begin{equation}
+-k^{**} \tilde{\phi}(l) = \tilde{f}(l).
+\end{equation}
+The minus sign is apparently some historical artifact, as it is not required.
+
+\subsection{Neumann Boundary Conditions}
+For Neumann boundary conditions, we choose as basis functions the
+cosine:
+\begin{equation}
+\psi(i,l)=\cos \left[\frac{\pi l}{N_x}\left(i+\frac{1}{2}\right)\right]
+\end{equation}
+which leads to solutions of the form
+\begin{equation}
+\phi(i)=\sum^{N_x-1}_{l=0} \tilde{\phi}(l)
+\cos \left[\frac{\pi l}{N_x}\left(i+\frac{1}{2}\right)\right]
+\end{equation}
+In this form, the coefficients $\tilde{\phi}(l)$ are the result of the
+discrete cosine transform (more specifically, the DCT-II).  We must
+determine the modified wavenumbers to proceed.  
+\begin{equation}
+\frac{\partial^2}{\partial x^2} 
+\cos \left[\frac{\pi l}{N_x}\left(i+\frac{1}{2}\right)\right] \approx
+\frac{ \cos \left[\frac{\pi l}{N_x}\left(i+\frac{1}{2}-1\right)\right]
+- 2 \cos \left[\frac{\pi l}{N_x}\left(i+\frac{1}{2}\right)\right]
++ \cos \left[\frac{\pi l}{N_x}\left(i+\frac{1}{2}+1\right)\right]}
+{\Delta x^2}
+\end{equation}
+
+ on the uniform which may may be solved by a variety of
+methods.  We use a Fourier cosine transform method.  We solve for
+$\phi$ of form
+\begin{equation}
+\phi(i,j,k)=\sum^{N_x-1}_{l=0}\ \sum^{N_z-1}_{m=0} \tilde{\phi}(l,j,m)
+\cos \left[\frac{\pi l}{N_x}\left(i+\frac{1}{2}\right)\right]
+\cos \left[\frac{\pi m}{N_z}\left(k+\frac{1}{2}\right)\right],
+\end{equation}
+where $i=0,\dots ,N_x-1$, $j=0,\dots ,N_y-1$, $k=0,\dots ,N_z-1$, and $l$
+and $m$ are the wave numbers.  Substituting this into
+\autoref{phipoisson}, we obtain
+\begin{equation}\label{phieq}
+\delta_2^2 \tilde{\phi} - k'_l\tilde{\phi} -
+k'_m\tilde{\phi}=\tilde{Q}(l,j,m),
+\end{equation}
+where $\tilde{Q}$ is the Fourier transform of $Q=\Delta
+t\frac{\partial^2 \phi}{\partial x_j \partial x_j}$, and $k'_l$ and
+$k'_m$ are the modified wave numbers defined as
+\begin{equation}
+k'_l=\frac{2}{\Delta x^2}\cos \left(\frac{\pi l}{N_x}\right)
+\hbox{\ \ and\ \ }
+k'_m=\frac{2}{\Delta z^2}\cos \left(\frac{\pi m}{N_z}\right).
+\end{equation}
+This equation results in a tridiagonal system of equations, which may
+be easily solved. We need only perform an inverse Fourier transform to
+find $\phi$.  
+
+\end{document}
+

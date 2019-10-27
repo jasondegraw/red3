@@ -14,15 +14,111 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 #include"grid.hpp"
+#include <algorithm>
 
 namespace red3 {
 
-Grid1D::Grid1D(index_t n) : generator(Generator::UniformN), N(n), uniform(true)
+double vkruh(double ds, double i, double I)
 {
-  double d{ 1.0 / static_cast<double>(N - 1) };
-  m_dx.resize(N - 1);
-  m_x.resize(N);
-  m_xm.resize(N - 1);
+  return 1.0 + tanh(ds * (i / I - 1.0)) / tanh(ds);
+}
+
+/*****************************************************************************/
+/*                                                                           */
+/*  hfindfactor - Given a spacing, determine the required stretching factor  */
+/*                                                                           */
+/*  The one sided stretching function between 0 and 1 is                     */
+/*                                                                           */
+/*          ds = 1 + tanh(factor * (i / I - 1)) / tanh(factor)               */
+/*                                                                           */
+/*  We apply Newton's Method to find the stretching factor given ds, i, and  */
+/*  I. The one stretching function can be reorganized as                     */
+/*                                                                           */
+/*           (ds - 1)tanh(factor) = tanh(factor * (i / I - 1))               */
+/*              C2 * tanh(factor) = tanh(C1 * factor)                        */
+/*                                                                           */
+/*  This only has solutions if |C2| > |C1|.  To see this, note that the      */
+/*  limit of the LHS is C2, and the limit of the RHS is -1.  Both C1 and C2  */
+/*  are negative.  The slopes at zero are C2 and C1. respectively, so the    */
+/*  only possible way that the two curves can intersect is if |C2| > |C1|.   */
+/*  Approximating tanh(C1*delta) as the line C1*delta for small delta, and   */
+/*  approximating  C2*tanh(delta) as C2 for large delta, we obtain an first  */
+/*  guess for the answer as                                                  */
+/*                                                                           */
+/*                             C2 = C1*factor                                */
+/*                                                                           */
+/*  Newton's method can now be used to determine the solution.               */
+/*                                                                           */
+/*****************************************************************************/
+std::optional<double> OneSidedVinokur::solve(double delta, double L, size_t i, size_t I, double tolerance, size_t max_iterations)
+//int vkruhff(double ds, double I, double* d, double tol, int itermax,
+//  FILE* debug, char* prefix)
+{
+  double ds{ delta / L }; // Rescale
+
+  int i = 0;
+  double f, fp, factor, s1, s2;
+  double C1{ 1.0 / I - 1.0 };
+  double C2 = ds - 1.0;
+
+  FILE* debug = 0;
+  messages.push_back("Vinokur h Stretching Factor Solution ---------------+");
+  fprintf(debug, "  ds = % .8e                              |", ds);
+  fprintf(debug, "   I = % .4e                                  |", I);
+  fprintf(debug, " tol = % .3e, itermax = %5d                  |", tolerance,
+    max_iterations);
+  messages.push_back("----------------------------------------------------+");
+
+  // Solve only for positive ds
+  if (ds <= 0.0) {
+    messages.push_back("No solution for negative ds.                        |");
+    messages.push_back("----------------------------------------------------+");
+    return {};
+  }
+
+  // Only have a nontrivial solution for |C2| > |C1|
+  if (C2 > 0.0 || C2 > C1) {
+    messages.push_back("No solution for given inputs.                       |");
+    messages.push_back("----------------------------------------------------+");
+    return {};
+  }
+  /*
+    As an initial guess, take the intersection of the lines
+
+      y = 1.0   (limit of tanh(d*C1)
+      y = C2*d  (approximation of C2*tanh(d))
+      y = C2    (limit of C2*tanh(d))
+      y = C1*d  (approximation of tanh(C1*d))
+  */
+  size_t iter = 1;
+  factor = C1 / C2;
+  f = tanh(factor * C1) - C2 * tanh(factor);
+  messages.push_back(" iter            d                      f           |");
+  messages.push_back("----- ---------------------- ---------------------- |");
+  fprintf(debug, "%5d % .15e % .15e |\n", iter, delta, f);
+
+  /* printf("%4d % .15e % .15e\n",i,delta,f); */
+  while (fabs(f) > tolerance && i <= max_iterations) {
+    s1 = 1.0 / cosh(delta * C1);
+    s2 = 1.0 / cosh(delta);
+    fp = C1 * s1 * s1 - C2 * s2 * s2;
+    delta -= f / fp;
+    f = tanh(delta * C1) - C2 * tanh(delta);
+    i++;
+    if (debug)fprintf(debug, "%5d % .15e % .15e |", iter, delta, f);
+  }
+  messages.push_back("----------------------------------------------------+");
+  if (fabs(f) > tolerance) return {};
+  return factor;
+}
+
+
+Grid1D::Grid1D(index_t n) : generator(Generator::UniformN), N(std::max(n, (index_t)1)), uniform(true)
+{
+  double d{ 1.0 / static_cast<double>(N) };
+  m_dx.resize(N);
+  m_x.resize(N + 1);
+  m_xm.resize(N);
   m_x[0] = 0.0;
   m_xm[0] = 0.5*d;
   m_dx[0] = 0.0;
