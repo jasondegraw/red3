@@ -24,7 +24,8 @@ set(HDRS red3api.hpp
          staggeredgrid.hpp
          upwind.hpp
          util.hpp
-		 utilities.hpp)
+         utilities.hpp)
 
 add_library(red3_core SHARED ${HDRS} ${SRCS} ${DEP_SRCS})
+target_link_libraries(red3_core fmt::fmt)
 

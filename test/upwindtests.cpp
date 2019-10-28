@@ -21,7 +21,7 @@
 
 TEST_CASE("Basic 2D Upwinding", "[upwind]")
 {
-  red3::upwind::StaggeredIncompressibleSteadyFlow grid(100.0, 1.0, 4, 5);
+  red3::upwind::StaggeredIncompressibleSteadyFlow grid(100.0, 1.0, red3::Grid1D(4), red3::Grid1D(5));
   REQUIRE(4 == grid.ni);
   REQUIRE(5 == grid.nu);
   REQUIRE(5 == grid.nj);
@@ -59,7 +59,7 @@ TEST_CASE("Basic 2D Upwinding", "[upwind]")
 
 TEST_CASE("1D Tests", "[upwind]")
 {
-  red3::upwind::StaggeredIncompressibleSteadyFlow grid(100.0, 1.0, 5, 2);
+  red3::upwind::StaggeredIncompressibleSteadyFlow grid(100.0, 1.0, red3::Grid1D(5), red3::Grid1D(2));
   REQUIRE(5 == grid.ni);
   REQUIRE(6 == grid.nu);
   REQUIRE(2 == grid.nj);

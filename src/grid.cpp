@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2016 Jason W. DeGraw
+// Copyright (C) 2015-2019 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
 //
 #include"grid.hpp"
 #include <algorithm>
+#include "fmt/printf.h"
 
 namespace red3 {
 
@@ -56,17 +57,15 @@ std::optional<double> OneSidedVinokur::solve(double delta, double L, size_t i, s
 {
   double ds{ delta / L }; // Rescale
 
-  int i = 0;
+  //int i = 0;
   double f, fp, factor, s1, s2;
   double C1{ 1.0 / I - 1.0 };
   double C2 = ds - 1.0;
 
-  FILE* debug = 0;
   messages.push_back("Vinokur h Stretching Factor Solution ---------------+");
-  fprintf(debug, "  ds = % .8e                              |", ds);
-  fprintf(debug, "   I = % .4e                                  |", I);
-  fprintf(debug, " tol = % .3e, itermax = %5d                  |", tolerance,
-    max_iterations);
+  messages.push_back(fmt::sprintf("  ds = % .8e                              |", ds));
+  messages.push_back(fmt::sprintf("   I = % .4e                                  |", I));
+  messages.push_back(fmt::sprintf(" tol = % .3e, itermax = %5d                  |", tolerance, max_iterations));
   messages.push_back("----------------------------------------------------+");
 
   // Solve only for positive ds
@@ -95,7 +94,7 @@ std::optional<double> OneSidedVinokur::solve(double delta, double L, size_t i, s
   f = tanh(factor * C1) - C2 * tanh(factor);
   messages.push_back(" iter            d                      f           |");
   messages.push_back("----- ---------------------- ---------------------- |");
-  fprintf(debug, "%5d % .15e % .15e |\n", iter, delta, f);
+  messages.push_back(fmt::sprintf("%5d % .15e % .15e |\n", iter, delta, f));
 
   /* printf("%4d % .15e % .15e\n",i,delta,f); */
   while (fabs(f) > tolerance && i <= max_iterations) {
@@ -105,7 +104,7 @@ std::optional<double> OneSidedVinokur::solve(double delta, double L, size_t i, s
     delta -= f / fp;
     f = tanh(delta * C1) - C2 * tanh(delta);
     i++;
-    if (debug)fprintf(debug, "%5d % .15e % .15e |", iter, delta, f);
+    messages.push_back(fmt::sprintf("%5d % .15e % .15e |", iter, delta, f));
   }
   messages.push_back("----------------------------------------------------+");
   if (fabs(f) > tolerance) return {};
@@ -113,21 +112,28 @@ std::optional<double> OneSidedVinokur::solve(double delta, double L, size_t i, s
 }
 
 
-Grid1D::Grid1D(index_t n) : generator(Generator::UniformN), N(std::max(n, (index_t)1)), uniform(true)
+std::optional<Grid1D> Grid1D::generate(Generator1D& generator) 
 {
-  double d{ 1.0 / static_cast<double>(N) };
-  m_dx.resize(N);
-  m_x.resize(N + 1);
-  m_xm.resize(N);
-  m_x[0] = 0.0;
-  m_xm[0] = 0.5*d;
-  m_dx[0] = 0.0;
-  for (index_t i = 1; i < N - 1; ++i) {
-    m_dx[i] = d;
-    m_x[i] = m_x[i - 1] + d;
-    m_xm[i] = m_xm[i - 1] + d;
+  if (generator.failed()) {
+    return {};
   }
-  m_x[N - 1] = 1.0;
+  return Grid1D(generator.grid(), generator.midgrid(), generator.delta(), generator.uniform());
+}
+
+Grid1D::Grid1D(index_t n, double L) : uniform(true)
+{
+  Uniform1D generator(n, L);
+  m_x = generator.grid();
+  m_xm = generator.midgrid();
+  m_dx = generator.delta();
+}
+
+Grid1D::Grid1D(int n) : Grid1D((index_t)std::max(1,n))
+{}
+
+Grid1D Grid1D::one()
+{
+  return Grid1D({ -0.5, 0.5 }, { 0.0 }, { 1.0 }, true);
 }
 
 }

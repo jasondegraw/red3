@@ -95,8 +95,8 @@ class RED3_API IsothermalFlow : public StaggeredGrid
 public:
   enum class BoundaryCondition {  };
   enum class Differencing {  };
-  IsothermalFlow(double reynum, double dt, unsigned ni, unsigned nj, unsigned nk = 1, bool xperi = false)
-    : StaggeredGrid(ni, nj, nk, xperi),
+  IsothermalFlow(double reynum, double dt, Grid1D& x, Grid1D& y, Grid1D& z=Grid1D::one(), bool xperi = false)
+    : StaggeredGrid(x, y, z, xperi),
     g(this), //aw(this), an(this), as(this), af(this), ab(this), b(this), 
     reynum(reynum), dt(dt)
   {

@@ -21,16 +21,13 @@
 #include <memory>
 #include <string>
 #include <optional>
+#include <algorithm>
 
 namespace red3 {
 
 class Generator1D
 {
 public:
-  Generator1D(size_t i) : n(i)
-  {
-    m_x.reserve(i+1);
-  }
 
   virtual bool successful() const
   {
@@ -42,61 +39,85 @@ public:
     return false;
   }
 
-  virtual size_t iterations() const
+  virtual index_t iterations() const
   {
     return 0;
   }
 
+  virtual bool uniform() const
+  {
+    return true;
+  }
+
   virtual double delta(double i) const = 0;
 
-  size_t size() const
-  {
-    return m_x.size();
-  }
+  virtual std::vector<double> grid() = 0;
 
-  double operator[](size_t i) const
-  {
-    return m_x[i];
-  }
+  virtual std::vector<double> midgrid() = 0;
+
+  virtual std::vector<double> delta() = 0;
+
+  //double operator[](index_t i) const
+  //{
+  //  return m_x[i];
+  //}
 
   std::vector<std::string> messages;
 
-  const size_t n;
+  //const index_t n;
 
-protected:
-  std::vector<double> m_x;
 };
 
 class Uniform1D : public Generator1D
 {
 public:
-  Uniform1D(double delta, size_t i) : Generator1D(i), m_delta(delta)
-  {
-    double x = 0.0;
-    for (size_t i = 0; i <= n; ++i) {
-      m_x.push_back(x);
-      x += delta;
-    }
-  }
+  Uniform1D(double delta, index_t n) : m_n(std::max(n,(index_t)1)), m_delta(delta <=0 ? 1.0 : delta), m_L(m_n*m_delta)
+  {}
 
-  Uniform1D(size_t i, double L) : Uniform1D(L/(double)i, i)
-  {
-    m_x.back() = L; // Force the last point to be at L
-  }
+  Uniform1D(size_t n, double L=1.0) : m_n(std::max(n,(index_t)1)), m_delta(std::abs(L)/(double)m_n), m_L(std::abs(L))
+  {}
 
   virtual double delta(double) const
   {
     return m_delta;
   }
 
-protected:
+  std::vector<double> grid()
+  {
+    std::vector<double> result(m_n + 1);
+    result[0] = 0.0;
+    for (index_t i = 1; i < m_n; ++i) {
+      result[i] = result[i - 1] + m_delta;
+    }
+    result[m_n] = m_L;
+    return result;
+  }
+
+  std::vector<double> midgrid()
+  {
+    std::vector<double> result(m_n);
+    result[0] = 0.5 * m_delta;
+    for (index_t i = 1; i < m_n; ++i) {
+      result[i] = result[i - 1] + m_delta;
+    }
+    return result;
+  }
+
+  std::vector<double> delta()
+  {
+    return std::vector<double>(m_n, m_delta);
+  }
+
+private:
+  index_t m_n;
   double m_delta;
+  double m_L;
 };
 
 class OneSidedVinokur : public Generator1D
 {
 public:
-  OneSidedVinokur(double delta, double L, size_t i, size_t I) : Generator1D(I), m_delta(delta)
+  OneSidedVinokur(double delta, double L, size_t i, size_t I)// : Generator1D(I), m_delta(delta)
   {
   }
 
@@ -115,6 +136,23 @@ public:
     return m_delta;
   }
 
+  std::vector<double> grid()
+  {
+    std::vector<double> result;
+    return result;
+  }
+
+  std::vector<double> midgrid()
+  {
+    std::vector<double> result;
+    return result;
+  }
+
+  std::vector<double> delta()
+  {
+    return std::vector<double>();
+  }
+
 private:
   std::optional<double> solve(double delta, double L, size_t i, size_t I, double tolerance, size_t max_iterations);
 
@@ -125,11 +163,12 @@ private:
 class RED3_API Grid1D
 {
 public:
-  enum class Generator { UniformN, UniformDelta };
-
-  Grid1D(index_t N);
-
-  virtual ~Grid1D() {}
+  static std::optional<Grid1D> generate(Generator1D& generator);
+ 
+  Grid1D(index_t n, double L = 1.0);
+  Grid1D(int n);
+ 
+  static Grid1D one();
 
   std::vector<double> grid() const
   {
@@ -141,7 +180,7 @@ public:
     return m_xm;
   }
 
-  std::vector<double> deltas() const
+  std::vector<double> delta() const
   {
     return m_dx;
   }
@@ -218,23 +257,19 @@ public:
 
   index_t size() const
   {
-    return N;
+    return m_x.size();
   }
 
-  const Generator generator;
-  const index_t N;
+  //const index_t N;
   const bool uniform;
 
 private:
+  Grid1D(std::vector<double> x, std::vector<double> xm, std::vector<double> dx, bool uniform) : uniform(false)
+  {}
+
   std::vector<double> m_x;
   std::vector<double> m_xm;
   std::vector<double> m_dx;
-};
-
-class RED3_API Grid2D
-{
-public:
-  Grid2D(std::unique_ptr<Grid1D> x, std::unique_ptr<Grid1D> y);
 };
 
 }

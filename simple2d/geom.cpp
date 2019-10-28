@@ -19,7 +19,10 @@
 
 int main(int argc, char *argv[])
 {
-  red3::upwind::StaggeredIncompressibleSteadyFlow solver(100.0, 1.0, 9, 9);
+  red3::Uniform1D uniform(9);
+  auto x = red3::Grid1D::generate(uniform);
+  auto y = red3::Grid1D::generate(uniform);
+  red3::upwind::StaggeredIncompressibleSteadyFlow solver(100.0, 1.0, *x, *y);
   auto pstar = solver.pArray();
   auto ustar = solver.uArray();
   auto vstar = solver.vArray();

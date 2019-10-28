@@ -20,9 +20,9 @@
 #include <iostream>
 #include <string>
 
-TEST_CASE("Basic 2D", "[StaggerdGrid]")
+TEST_CASE("Basic 2D Staggered", "[StaggerdGrid]")
 {
-  red3::StaggeredGrid grid(4, 5);
+  red3::StaggeredGrid grid(red3::Grid1D(4), red3::Grid1D(5));
   REQUIRE(4 == grid.ni);
   REQUIRE(5 == grid.nu);
   REQUIRE(5 == grid.nj);
@@ -33,6 +33,7 @@ TEST_CASE("Basic 2D", "[StaggerdGrid]")
   REQUIRE(5 == grid.x.size());
   std::vector<double> x = { 0.0, 0.25, 0.5, 0.75, 1.0 };
   for(auto i = 0; i < grid.nu; i++) {
+    INFO("Index: " << i);
     REQUIRE(x[i] == grid.x[i]);
   }
   REQUIRE(4 == grid.x.midgrid().size());

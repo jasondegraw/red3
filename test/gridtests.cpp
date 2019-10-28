@@ -19,7 +19,10 @@
 
 TEST_CASE("Uniform Grid 1D", "[grid]")
 {
-  red3::Uniform1D x(0.25, 4);
+  red3::Uniform1D uniform_x(0.25, 4);
+  std::optional<red3::Grid1D> opt_x = red3::Grid1D::generate(uniform_x);
+  REQUIRE(opt_x);
+  red3::Grid1D x = opt_x.value();
   REQUIRE(5 == x.size());
   REQUIRE(0.25 == x.delta(0));
   // Check grid
@@ -29,7 +32,10 @@ TEST_CASE("Uniform Grid 1D", "[grid]")
   REQUIRE(0.75 == x[3]);
   REQUIRE(1.0 == x[4]);
 
-  red3::Uniform1D y(4, 1.0);
+  red3::Uniform1D uniform_y(4, 1.0);
+  std::optional<red3::Grid1D> opt_y = red3::Grid1D::generate(uniform_y);
+  REQUIRE(opt_y);
+  red3::Grid1D y = opt_y.value();
   REQUIRE(5 == y.size());
   REQUIRE(0.25 == y.delta(0));
   // Check grid

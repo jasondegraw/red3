@@ -21,7 +21,7 @@
 
 namespace red3 {
 
-template <typename T, typename U> class  BaseArray
+template <typename T, typename U> class BaseArray
 {
 public:
   BaseArray() : m_parent(nullptr)
@@ -30,7 +30,7 @@ public:
   BaseArray(T* parent, index_t N) : m_parent(parent)
   {
     m_impl = std::shared_ptr<double>(new double[N], std::default_delete<double[]>());
-    clear();
+    memset(m_impl.get(), 0, N * sizeof(double));
   }
 
   BaseArray(T* parent, std::shared_ptr<double> impl) : m_impl(impl), m_parent(parent)
@@ -149,7 +149,6 @@ public:
   //inline double copy(ChildArrayU &other)
   //{
   //  int nijk = m_parent->nu * m_parent->nj * m_parent->nk;
-
   //}
 
   index_t size() const

@@ -41,7 +41,7 @@ public:
 
   //using index_t = int;
 
-  StaggeredGrid(index_t ni, index_t nj, index_t nk = 1, bool xperi = false);
+  StaggeredGrid(Grid1D& x, Grid1D& y, Grid1D& z = Grid1D::one(), bool xperi = false);
 
   virtual ~StaggeredGrid()
   {}

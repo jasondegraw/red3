@@ -23,6 +23,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 #include_directories("dependencies/jsoncpp")
 # Eigen Dependency
 include_directories(dependencies/eigen-eigen-5a0156e40feb/)
+# fmt
+add_subdirectory(dependencies/fmt-6.0.0)
+include_directories(dependencies/fmt-6.0.0/include)
 
 add_subdirectory(src)
 add_subdirectory(laminar-channel)

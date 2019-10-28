@@ -14,29 +14,77 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "staggeredgrid.hpp"
+#include "red3.hpp"
 #include "array.hpp"
 #include "catch.hpp"
 
-TEST_CASE("Basic 2D Arrays", "[Array]")
+struct ArrayParentU
 {
-  red3::StaggeredGrid grid(4, 5);
-  red3::StaggeredGrid::ArrayU array(&grid);
+  ArrayParentU(red3::index_t ni, red3::index_t nj, red3::index_t nk = 1) : nu(ni+1), nj(nj), nk(nk)
+  { }
+
+  red3::index_t nu;
+  red3::index_t nj;
+  red3::index_t nk;
+};
+
+TEST_CASE("Basic 2D U Arrays", "[array]")
+{
+  ArrayParentU grid(4, 5);
+  red3::ChildArrayU<ArrayParentU> array(&grid);
+  REQUIRE(25 == array.size());
   for(auto j = 0; j < grid.nj; j++) {
     for(auto i = 0; i < grid.nu; i++) {
       array(i, j, 0) = i;
     }
   }
   std::vector<double> v = { 0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 1.0, 2.0, 3.0, 4.0,
-    0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 1.0, 2.0, 3.0, 4.0};
+    0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 1.0, 2.0, 3.0, 4.0, 0.0, 1.0, 2.0, 3.0, 4.0 };
   for(auto i = 0; i < 25; i++) {
+    INFO("Index: " << i);
     REQUIRE(v[i] == array[i]);
     array[i] = (double)i;
   }
   double value = 0.0;
   for(auto i = 0; i < 25; i++) {
+    INFO("Index: " << i);
     REQUIRE(value == array[i]);
     value += 1.0;
   }
 }
 
+struct ArrayParentV
+{
+  ArrayParentV(red3::index_t ni, red3::index_t nj, red3::index_t nk = 1) : ni(ni), nv(nj+1), nk(nk)
+  {
+  }
+
+  red3::index_t ni;
+  red3::index_t nv;
+  red3::index_t nk;
+};
+
+TEST_CASE("Basic 2D V Arrays", "[array]")
+{
+  ArrayParentV grid(4, 5);
+  red3::ChildArrayV<ArrayParentV> array(&grid);
+  REQUIRE(24 == array.size());
+  for (auto j = 0; j < grid.nv; j++) {
+    for (auto i = 0; i < grid.ni; i++) {
+      array(i, j, 0) = j;
+    }
+  }
+  std::vector<double> v = { 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 0.0, 1.0, 2.0, 3.0, 4.0,
+    5.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0 };
+  for (auto i = 0; i < 24; i++) {
+    INFO("Index: " << i);
+    REQUIRE(v[i] == array[i]);
+    array[i] = (double)i;
+  }
+  double value = 0.0;
+  for (auto i = 0; i < 24; i++) {
+    INFO("Index: " << i);
+    REQUIRE(value == array[i]);
+    value += 1.0;
+  }
+}

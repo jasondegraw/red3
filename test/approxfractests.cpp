@@ -99,6 +99,6 @@ TEST_CASE("Basic 2D Approximate Factorization", "[IsothermalFlow]")
 TEST_CASE("Basic 2D Multiblock Approximate Factorization", "[IsothermalFlow]")
 {
   std::vector<red3::approxfrac::IsothermalFlow> blocks;
-  blocks.emplace_back(100.0, 0.01, 32, 32);
+  blocks.emplace_back(100.0, 0.01, red3::Grid1D(32), red3::Grid1D(32));
 }
 

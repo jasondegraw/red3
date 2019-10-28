@@ -22,17 +22,10 @@
 namespace red3
 {
 
-  StaggeredGrid::StaggeredGrid(index_t ni, index_t nj, index_t nk, bool xperi)
-    : ni(ni), nj(nj), nk(std::max(nk, (index_t)1)), nu(ni + 1), nv(nj + 1), nw(nk == 1 ? 1 : nk + 1), xperi(xperi),
-    two_dimensional(nk == 1), x(nu), y(nv), z(nw), nnu(nu*nj*nk), nnv(ni*nv*nk), nnw(ni*nj*nw), ncells(ni*nj*nk), bfx(0.0), bfy(0.0), bfz(0.0)
+  StaggeredGrid::StaggeredGrid(Grid1D& x, Grid1D& y, Grid1D& z, bool xperi)
+    : ni(x.size()), nj(y.size()), nk(x.size()), nu(ni + 1), nv(nj + 1), nw(nk == 1 ? 1 : nk + 1), xperi(xperi),
+    two_dimensional(nk == 1), x(x), y(y), z(z), nnu(nu*nj*nk), nnv(ni*nv*nk), nnw(ni*nj*nw), ncells(ni*nj*nk), bfx(0.0), bfy(0.0), bfz(0.0)
   {
-    // Check the inputs
-    if (ni < 2) {
-      fatal("ni must be greater than 1");
-    }
-    if (nj < 2) {
-      fatal("nj must be greater than 1");
-    }
 
     int nuvw = ni + nj + 2;
     if (nk > 1) {

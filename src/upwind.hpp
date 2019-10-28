@@ -31,8 +31,8 @@ class RED3_API StaggeredIncompressibleSteadyFlow : public StaggeredGrid
 public:
   enum class BoundaryCondition {  };
 
-  StaggeredIncompressibleSteadyFlow(double rho, double mu, index_t ni, index_t nj, index_t nk = 1,
-    Differencing diff = Differencing::FirstOrder, bool xperi = false) : StaggeredGrid(ni, nj, nk, xperi), differencing(diff),
+  StaggeredIncompressibleSteadyFlow(double rho, double mu, Grid1D& x, Grid1D& y, Grid1D& z = Grid1D::one(),
+    Differencing diff = Differencing::FirstOrder, bool xperi = false) : StaggeredGrid(x, y, z, xperi), differencing(diff),
     ae(this), aw(this), an(this), as(this), af(this), ab(this), b(this), rho(rho), mu(mu)
   {
     switch(differencing) {

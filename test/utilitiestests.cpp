@@ -35,7 +35,7 @@ TEST_CASE("Basic I Tests", "[tridai]")
   // a[3]*x[2] + b[3]*x[3] + c[3]*x[4] = 0
   // a[3]*x[2] + b[3]*x[3] = -c[3]*x[4]
   
-  red3::StaggeredGrid grid(5, 2, 2);
+  red3::StaggeredGrid grid(red3::Grid1D(5), red3::Grid1D(2), red3::Grid1D(2));
   auto g = grid.pArray();
   std::vector<double> a{ {-0.5, -0.5, -0.5, -0.5, -0.5} };
   std::vector<double> b{ { 1.0, 1.0, 1.0, 1.0, 1.0 } };
@@ -93,7 +93,7 @@ TEST_CASE("Basic Reverse I Tests", "[tridai]")
   // a[3]*x[2] + b[3]*x[3] + c[3]*x[4] = 0
   // a[3]*x[2] + b[3]*x[3] = -c[3]*x[4]
 
-  red3::StaggeredGrid grid(5, 2, 2);
+  red3::StaggeredGrid grid(red3::Grid1D(5), red3::Grid1D(2), red3::Grid1D(2));
   auto g = grid.pArray();
   std::vector<double> a{ { -0.5, -0.5, -0.5, -0.5, -0.5 } };
   std::vector<double> b{ { 1.0, 1.0, 1.0, 1.0, 1.0 } };
@@ -143,7 +143,7 @@ TEST_CASE("Basic J Tests", "[tridaj]")
   // a[3]*x[2] + b[3]*x[3] + c[3]*x[4] = 0
   // a[3]*x[2] + b[3]*x[3] = -c[3]*x[4]
 
-  red3::StaggeredGrid grid(2, 5, 2);
+  red3::StaggeredGrid grid(red3::Grid1D(2), red3::Grid1D(5), red3::Grid1D(2));
   auto g = grid.pArray();
   std::vector<double> a{ { -0.5, -0.5, -0.5, -0.5, -0.5 } };
   std::vector<double> b{ { 1.0, 1.0, 1.0, 1.0, 1.0 } };
@@ -201,7 +201,7 @@ TEST_CASE("Basic Reverse J Tests", "[tridaj]")
   // a[3]*x[2] + b[3]*x[3] + c[3]*x[4] = 0
   // a[3]*x[2] + b[3]*x[3] = -c[3]*x[4]
 
-  red3::StaggeredGrid grid(2, 5, 2);
+  red3::StaggeredGrid grid(red3::Grid1D(2), red3::Grid1D(5), red3::Grid1D(2));
   auto g = grid.pArray();
   std::vector<double> a{ { -0.5, -0.5, -0.5, -0.5, -0.5 } };
   std::vector<double> b{ { 1.0, 1.0, 1.0, 1.0, 1.0 } };
@@ -265,7 +265,7 @@ TEST_CASE("Basic Periodic K Tests", "[tripak]")
   // a[7]*x[6] + b[7]*x[7] + c[7]*x[8] = 0
   // a[7]*x[6] + b[7]*x[7] = -c[7]*x[8]
 
-  red3::StaggeredGrid grid(2, 2, 9);
+  red3::StaggeredGrid grid(red3::Grid1D(2), red3::Grid1D(2), red3::Grid1D(9));
   auto g = grid.pArray();
   std::vector<double> a{ { -0.5, -0.5, -0.5, -0.5, -0.5, -0.5, -0.5, -0.5, -0.5 } };
   std::vector<double> b{ { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 } };
