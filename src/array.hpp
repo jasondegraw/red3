@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2019 Jason W. DeGraw
+// Copyright (C) 2015-2022 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,11 +36,12 @@ public:
   BaseArray(T* parent, std::shared_ptr<double> impl) : m_impl(impl), m_parent(parent)
   {}
 
-  //U& operator=(const U &other)
-  //{
-  //  m_impl = other.m_impl;
-  //  return *this;
-  //}
+  U& operator=(const U &other)
+  {
+    m_impl = other.m_impl;
+    m_parent = other.m_parent;
+    return *this;
+  }
 
   bool operator==(const U &other) const
   {
@@ -73,8 +74,9 @@ public:
 
   void swap(U &other)
   {
-    // Should check for shared parentage here
-    m_impl.swap(other.m_impl);
+    if (m_parent == other.m_parent) {
+      m_impl.swap(other.m_impl);
+    }
   }
 
   T* parent() const
@@ -91,7 +93,7 @@ protected:
 template <class T> class ChildArray : public BaseArray<T, ChildArray<T>>
 {
 public:
-  ChildArray()
+  ChildArray() : BaseArray<T, ChildArray<T>>()
   {}
 
   ChildArray(T *parent) : BaseArray<T, ChildArray<T>>(parent, parent->ni*parent->nj*parent->nk)
@@ -102,12 +104,12 @@ public:
 
   double &operator()(index_t i, index_t j, index_t k)
   {
-    return (m_impl.get())[INDEX(i, j, k, m_parent->ni, m_parent->nj, m_parent->nk)];
+    return (this->m_impl.get())[INDEX(i, j, k, this->m_parent->ni, this->m_parent->nj, this->m_parent->nk)];
   }
 
   index_t size() const
   {
-    return m_parent->ni*m_parent->nj*m_parent->nk;
+    return this->m_parent->ni*this->m_parent->nj*this->m_parent->nk;
   }
 
 };
@@ -115,7 +117,7 @@ public:
 template <class T> class ChildArrayU : public BaseArray<T, ChildArrayU<T>>
 {
 public:
-  ChildArrayU()
+  ChildArrayU() : BaseArray<T, ChildArrayU<T>>()
   {}
 
   ChildArrayU(T *parent) : BaseArray<T, ChildArrayU<T>>(parent, parent->nu*parent->nj*parent->nk)
@@ -124,26 +126,16 @@ public:
   ChildArrayU(const ChildArrayU &other) : BaseArray<T, ChildArrayU<T>>(other.m_parent, other.m_impl)
   {}
 
-  ChildArrayU& operator=(const ChildArrayU &other)
-  {
-    m_impl = other.m_impl;
-    m_parent = other.m_parent;
-    return *this;
-  }
-
-  bool operator==(const ChildArrayU &other) const
-  {
-    return m_impl == other.m_impl;
-  }
-
-  bool operator!=(const ChildArrayU &other) const
-  {
-    return m_impl != other.m_impl;
-  }
+  //ChildArrayU& operator=(const ChildArrayU &other)
+  //{
+  //  this->m_impl = other.m_impl;
+  //  this->m_parent = other.m_parent;
+  //  return *this;
+  //}
 
   inline double &operator()(index_t i, index_t j, index_t k)
   {
-    return (m_impl.get())[UINDEX(i, j, k, m_parent->nu, m_parent->nj, m_parent->nk)];
+    return (this->m_impl.get())[UINDEX(i, j, k, this->m_parent->nu, this->m_parent->nj, this->m_parent->nk)];
   }
 
   //inline double copy(ChildArrayU &other)
@@ -153,7 +145,7 @@ public:
 
   index_t size() const
   {
-    return m_parent->nu*m_parent->nj*m_parent->nk;
+    return this->m_parent->nu * this->m_parent->nj * this->m_parent->nk;
   }
 
 };
@@ -161,7 +153,7 @@ public:
 template <class T> class ChildArrayUVW : public BaseArray<T, ChildArrayUVW<T>>
 {
 public:
-  ChildArrayUVW() : m_parent(nullptr), m_impl(nullptr)
+  ChildArrayUVW() : BaseArray<T, ChildArrayUVW<T>>()
   {}
 
   ChildArrayUVW(T *parent) : BaseArray<T, ChildArrayUVW<T>>(parent, parent->nu*parent->nv*parent->nw)
@@ -170,41 +162,14 @@ public:
   ChildArrayUVW(const ChildArrayUVW &other) : BaseArray<T, ChildArrayUVW<T>>(other.m_parent, other.m_impl)
   {}
 
-  ChildArrayUVW& operator=(const ChildArrayUVW &other)
-  {
-    m_impl = other.m_impl;
-    m_parent = other.m_parent
-    return *this;
-  }
-
-  bool operator==(const ChildArrayUVW &other) const
-  {
-    return m_impl == other.m_impl;
-  }
-
-  bool operator!=(const ChildArrayUVW &other) const
-  {
-    return m_impl != other.m_impl;
-  }
-
-  inline double &operator[](unsigned i)
-  {
-    return (m_impl.get())[i];
-  }
-
-  inline double &operator()(unsigned i)
-  {
-    return (m_impl.get())[i];
-  }
-
   double &operator()(index_t i, index_t j, index_t k)
   {
-    return (m_impl.get())[INDEX(i, j, k, m_parent->nu, m_parent->nv, m_parent->nw)];
+    return (this->m_impl.get())[INDEX(i, j, k, this->m_parent->nu, this->m_parent->nv, this->m_parent->nw)];
   }
 
   index_t size() const
   {
-    return m_parent->nu*m_parent->nv*m_parent->nw;
+    return this->m_parent->nu * this->m_parent->nv * this->m_parent->nw;
   }
 
 };
@@ -221,29 +186,14 @@ public:
   ChildArrayV(const ChildArrayV &other) : BaseArray<T, ChildArrayV<T>>(other.m_parent, other.m_impl)
   {}
 
-  ChildArrayV& operator=(const ChildArrayV &other)
-  {
-    m_impl = other.m_impl;
-    m_parent = other.m_parent;
-    return *this;
-  }
-  bool operator==(const ChildArrayV &other) const
-  {
-    return m_impl == other.m_impl;
-  }
-  bool operator!=(const ChildArrayV &other) const
-  {
-    return m_impl != other.m_impl;
-  }
-
   double &operator()(index_t i, index_t j, index_t k)
   {
-    return (m_impl.get())[VINDEX(i, j, k, m_parent->ni, m_parent->nv, m_parent->nk)];
+    return (this->m_impl.get())[VINDEX(i, j, k, this->m_parent->ni, this->m_parent->nv, this->m_parent->nk)];
   }
 
   index_t size() const
   {
-    return m_parent->ni*m_parent->nv*m_parent->nk;
+    return this->m_parent->ni * this->m_parent->nv * this->m_parent->nk;
   }
 
 };
@@ -260,31 +210,14 @@ public:
   ChildArrayW(const ChildArrayW &other) : BaseArray<T, ChildArrayW<T>>(other.m_parent, other.m_impl)
   {}
 
-  ChildArrayW& operator=(const ChildArrayW &other)
-  {
-    m_impl = other.m_impl;
-    m_parent = other.m_parent;
-    return *this;
-  }
-
-  bool operator==(const ChildArrayW &other) const
-  {
-    return m_impl == other.m_impl;
-  }
-
-  bool operator!=(const ChildArrayW &other) const
-  {
-    return m_impl != other.m_impl;
-  }
-
   double &operator()(index_t i, index_t j, index_t k)
   {
-    return (m_impl.get())[WINDEX(i, j, k, m_parent->ni, m_parent->nj, m_parent->nw)];
+    return (this->m_impl.get())[WINDEX(i, j, k, this->m_parent->ni, this->m_parent->nj, this->m_parent->nw)];
   }
 
   index_t size() const
   {
-    return m_parent->ni*m_parent->nj*m_parent->nw;
+    return this->m_parent->ni * this->m_parent->nj * this->m_parent->nw;
   }
 
 };

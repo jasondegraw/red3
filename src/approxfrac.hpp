@@ -19,7 +19,7 @@
 #include "array.hpp"
 #include <functional>
 #include "red3api.hpp"
-#include <Eigen/Sparse>
+//#include <Eigen/Sparse>
 
 namespace red3 {
 namespace approxfrac {
@@ -102,6 +102,8 @@ public:
   {
 
   }
+
+  void initialize()
 
 
   void setupU();
