@@ -12,7 +12,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
 #ifdef __cpp_modules
 #ifdef _MSC_VER
 #define BOOST_UT_DISABLE_MODULE
@@ -24,38 +23,37 @@ import boost.ut; // Doesn't appear to work yet with MSVC/CMake
 #include <boost/ut.hpp>
 #endif
 
-#include "grid.hpp"
+#ifdef _MSC_VER
+#include <windows.h>
+#endif
 
-boost::ut::suite grids = [] {
+int main(int argc, const char** argv)
+{
   using namespace boost::ut;
 
-  "uniform grid 1d"_test = [] {
-    red3::Uniform1D uniform_x(0.25, 4);
-    std::optional<red3::Grid1D> opt_x = red3::Grid1D::generate(uniform_x);
-    expect((!!opt_x) >> fatal);
-    red3::Grid1D x = opt_x.value();
-    expect((5_i == x.size()) >> fatal);
-    expect(0.25_d == x.delta(0));
-    // Check grid
-    expect(0.0_d == x[0]);
-    expect(0.25_d == x[1]);
-    expect(0.5_d == x[2]);
-    expect(0.75_d == x[3]);
-    expect(1.0_d == x[4]);
+  bool dry_run{false};
 
-    red3::Uniform1D uniform_y(4, 1.0);
-    std::optional<red3::Grid1D> opt_y = red3::Grid1D::generate(uniform_y);
-    expect((!!opt_y) >> fatal);
-    red3::Grid1D y = opt_y.value();
-    expect((5_i == y.size()) >> fatal);
-    expect(0.25_d == y.delta(0));
-    // Check grid
-    expect(0.0_d == y[0]);
-    expect(0.25_d == y[1]);
-    expect(0.5_d == y[2]);
-    expect(0.75_d == y[3]);
-    expect(1.0_d == y[4]);
-  };
-};
+#ifdef _MSC_VER
+  auto custom_colors = colors{ .none = "", .pass = "", .fail = "" };
+  auto console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+  if (console_handle != INVALID_HANDLE_VALUE) {
+    DWORD console_mode;
+    GetConsoleMode(console_handle, &console_mode);
+    console_mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    auto success = SetConsoleMode(console_handle, console_mode);
+    if (success != 0) {
+      custom_colors.none = "\033[0m";
+      custom_colors.pass = "\033[32m";
+      custom_colors.fail = "\033[91m";
+    }
+  }
+#else
+  auto custom_colors = colors{};
+#endif
 
+  cfg<override> = {.filter = argc > 1 ? argv[1] : "",
+                   .colors = custom_colors,
+                   .dry_run = dry_run};
 
+  return EXIT_SUCCESS;
+}

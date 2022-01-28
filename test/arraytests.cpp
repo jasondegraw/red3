@@ -13,7 +13,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include "ut-wrapper.hpp"
+#ifdef __cpp_modules
+#ifdef _MSC_VER
+#define BOOST_UT_DISABLE_MODULE
+#include <boost/ut.hpp>
+#else
+import boost.ut; // Doesn't appear to work yet with MSVC/CMake
+#endif
+#else
+#include <boost/ut.hpp>
+#endif
 
 #include "red3.hpp"
 #include "array.hpp"
