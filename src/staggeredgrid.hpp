@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2019 Jason W. DeGraw
+// Copyright (C) 2015-2022 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,7 +41,8 @@ public:
 
   //using index_t = int;
 
-  StaggeredGrid(Grid1D& x, Grid1D& y, Grid1D& z = Grid1D::one(), bool xperi = false);
+  StaggeredGrid(Grid1D& x, Grid1D& y, bool xperi = false);
+  StaggeredGrid(Grid1D& x, Grid1D& y, Grid1D& z, bool xperi = false);
 
   virtual ~StaggeredGrid()
   {}
@@ -52,43 +53,43 @@ public:
   double eastU(int j, int k) { return u[UINDEX(ni, j, k, nu, nj, nk)]; }
   double westU(int j, int k) { return u[UINDEX(0, j, k, nu, nj, nk)]; }
 
-  template <typename M> void divg(M &g)
-  {
-    int i0 = 0, i1 = 0, j0 = 0, j1 = 0;
-    for(int k = 0; k < nk; k++) {
-      for(int j = 0; j < nj; j++) {
-        for(int i = 0; i < ni; i++) {
-          g[i0] = (m_u[i1 + 1] - m_u[i1]) * m_rdx[i];
-          i0++;
-          i1++;
-        }
-        i1++;
-      }
-    }
-    for(int k = 0; k < nk; k++) {
-      for(int i = 0; i < ni; i++) {
-        for(int j = 0; j < nj; j++) {
-          g[j0] += (m_v[j1 + 1] - m_v[j1]) * m_rdy[j];
-          j0++;
-          j1++;
-        }
-        j1++;
-      }
-    }
-    if(nw) {
-      int k0 = 0, k1 = 0;
-      for(int j = 0; j < nj; j++) {
-        for(int i = 0; i < ni; i++) {
-          for(int k = 0; k < nk; k++) {
-            g[k0] += (m_w[k1 + 1] - m_w[k1]) * m_rdz[k];
-            k0++;
-            k1++;
-          }
-          k1++;
-        }
-      }
-    }
-  }
+  //template <typename M> void divg(M &g)
+  //{
+  //  int i0 = 0, i1 = 0, j0 = 0, j1 = 0;
+  //  for(int k = 0; k < nk; k++) {
+  //    for(int j = 0; j < nj; j++) {
+  //      for(int i = 0; i < ni; i++) {
+  //        g[i0] = (m_u[i1 + 1] - m_u[i1]) * m_rdx[i];
+  //        i0++;
+  //        i1++;
+  //      }
+  //      i1++;
+  //    }
+  //  }
+  //  for(int k = 0; k < nk; k++) {
+  //    for(int i = 0; i < ni; i++) {
+  //      for(int j = 0; j < nj; j++) {
+  //        g[j0] += (m_v[j1 + 1] - m_v[j1]) * m_rdy[j];
+  //        j0++;
+  //        j1++;
+  //      }
+  //      j1++;
+  //    }
+  //  }
+  //  if(nw) {
+  //    int k0 = 0, k1 = 0;
+  //    for(int j = 0; j < nj; j++) {
+  //      for(int i = 0; i < ni; i++) {
+  //        for(int k = 0; k < nk; k++) {
+  //          g[k0] += (m_w[k1 + 1] - m_w[k1]) * m_rdz[k];
+  //          k0++;
+  //          k1++;
+  //        }
+  //        k1++;
+  //      }
+  //    }
+  //  }
+  //}
 
   void divg(ArrayP &g)
   {

@@ -5,8 +5,8 @@ enable_testing(true)
 set(SRCS main.cpp
          #approxfractests.cpp
          arraytests.cpp
-         #gridtests.cpp
-         #staggeredgridtests.cpp
+         gridtests.cpp
+         staggeredgridtests.cpp
          #upwindtests.cpp
          #utilitiestests.cpp
 )
@@ -14,6 +14,6 @@ set(SRCS main.cpp
 include_directories(../src)
 include_directories(../dependencies)
 
-add_executable(red3tests ${SRCS})
+add_executable(red3tests ut-wrapper.hpp ${SRCS})
 add_test(red3tests red3tests)
-#target_link_libraries(red3tests red3_core)
+target_link_libraries(red3tests red3_core)

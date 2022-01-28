@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2019 Jason W. DeGraw
+// Copyright (C) 2015-2022 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,36 +13,40 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include "catch.hpp"
+#include "ut-wrapper.hpp"
 
 #include "grid.hpp"
 
-TEST_CASE("Uniform Grid 1D", "[grid]")
-{
-  red3::Uniform1D uniform_x(0.25, 4);
-  std::optional<red3::Grid1D> opt_x = red3::Grid1D::generate(uniform_x);
-  REQUIRE(opt_x);
-  red3::Grid1D x = opt_x.value();
-  REQUIRE(5 == x.size());
-  REQUIRE(0.25 == x.delta(0));
-  // Check grid
-  REQUIRE(0.0 == x[0]);
-  REQUIRE(0.25 == x[1]);
-  REQUIRE(0.5 == x[2]);
-  REQUIRE(0.75 == x[3]);
-  REQUIRE(1.0 == x[4]);
+boost::ut::suite grids = [] {
+  using namespace boost::ut;
 
-  red3::Uniform1D uniform_y(4, 1.0);
-  std::optional<red3::Grid1D> opt_y = red3::Grid1D::generate(uniform_y);
-  REQUIRE(opt_y);
-  red3::Grid1D y = opt_y.value();
-  REQUIRE(5 == y.size());
-  REQUIRE(0.25 == y.delta(0));
-  // Check grid
-  REQUIRE(0.0 == y[0]);
-  REQUIRE(0.25 == y[1]);
-  REQUIRE(0.5 == y[2]);
-  REQUIRE(0.75 == y[3]);
-  REQUIRE(1.0 == y[4]);
-}
+  "uniform grid 1d"_test = [] {
+    red3::Uniform1D uniform_x(0.25, 4);
+    std::optional<red3::Grid1D> opt_x = red3::Grid1D::generate(uniform_x);
+    expect((!!opt_x) >> fatal);
+    red3::Grid1D x = opt_x.value();
+    expect((5_i == x.size()) >> fatal);
+    expect(0.25_d == x.delta(0));
+    // Check grid
+    expect(0.0_d == x[0]);
+    expect(0.25_d == x[1]);
+    expect(0.5_d == x[2]);
+    expect(0.75_d == x[3]);
+    expect(1.0_d == x[4]);
+
+    red3::Uniform1D uniform_y(4, 1.0);
+    std::optional<red3::Grid1D> opt_y = red3::Grid1D::generate(uniform_y);
+    expect((!!opt_y) >> fatal);
+    red3::Grid1D y = opt_y.value();
+    expect((5_i == y.size()) >> fatal);
+    expect(0.25_d == y.delta(0));
+    // Check grid
+    expect(0.0_d == y[0]);
+    expect(0.25_d == y[1]);
+    expect(0.5_d == y[2]);
+    expect(0.75_d == y[3]);
+    expect(1.0_d == y[4]);
+  };
+};
+
 

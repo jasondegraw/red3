@@ -22,12 +22,24 @@
 namespace red3
 {
 
+  StaggeredGrid::StaggeredGrid(Grid1D& x, Grid1D& y, bool xperi)
+    : ni(x.size()-1), nj(y.size()-1), nk(1), nu(ni + 1), nv(nj + 1), nw(1), xperi(xperi),
+    two_dimensional(true), x(x), y(y), z(Grid1D::one()), nnu(nu* nj* nk), nnv(ni* nv* nk), nnw(ni* nj* nw), ncells(ni* nj* nk), bfx(0.0), bfy(0.0), bfz(0.0)
+  {
+    u = uArray();
+    v = vArray();
+    p = pArray();
+
+    m_u_n = (double*)callocate(ni * nk, sizeof(double), "north u velocity");
+    m_u_s = (double*)callocate(ni * nk, sizeof(double), "south u velocity");
+  }
+
   StaggeredGrid::StaggeredGrid(Grid1D& x, Grid1D& y, Grid1D& z, bool xperi)
-    : ni(x.size()), nj(y.size()), nk(x.size()), nu(ni + 1), nv(nj + 1), nw(nk == 1 ? 1 : nk + 1), xperi(xperi),
-    two_dimensional(nk == 1), x(x), y(y), z(z), nnu(nu*nj*nk), nnv(ni*nv*nk), nnw(ni*nj*nw), ncells(ni*nj*nk), bfx(0.0), bfy(0.0), bfz(0.0)
+    : ni(x.size()-1), nj(y.size()-1), nk(z.size()), nu(ni + 1), nv(nj + 1), nw(nk == 1 ? 1 : nk + 1), xperi(xperi),
+    two_dimensional(false), x(x), y(y), z(z), nnu(nu*nj*nk), nnv(ni*nv*nk), nnw(ni*nj*nw), ncells(ni*nj*nk), bfx(0.0), bfy(0.0), bfz(0.0)
   {
 
-    int nuvw = ni + nj + 2;
+    auto nuvw = ni + nj + 2;
     if (nk > 1) {
       w = wArray();
     }

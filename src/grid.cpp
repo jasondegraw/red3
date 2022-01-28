@@ -15,7 +15,8 @@
 //
 #include"grid.hpp"
 #include <algorithm>
-#include "fmt/printf.h"
+#include <format>
+//#include "fmt/printf.h"
 
 namespace red3 {
 
@@ -63,9 +64,9 @@ std::optional<double> OneSidedVinokur::solve(double delta, double L, size_t i, s
   double C2 = ds - 1.0;
 
   messages.push_back("Vinokur h Stretching Factor Solution ---------------+");
-  messages.push_back(fmt::sprintf("  ds = % .8e                              |", ds));
-  messages.push_back(fmt::sprintf("   I = % .4e                                  |", I));
-  messages.push_back(fmt::sprintf(" tol = % .3e, itermax = %5d                  |", tolerance, max_iterations));
+  messages.push_back(std::format("  ds = { .8e}                              |", ds));
+  messages.push_back(std::format("   I = { .4e}                                  |", I));
+  messages.push_back(std::format(" tol = { .3e}, itermax = {5d}                  |", tolerance, max_iterations));
   messages.push_back("----------------------------------------------------+");
 
   // Solve only for positive ds
@@ -94,7 +95,7 @@ std::optional<double> OneSidedVinokur::solve(double delta, double L, size_t i, s
   f = tanh(factor * C1) - C2 * tanh(factor);
   messages.push_back(" iter            d                      f           |");
   messages.push_back("----- ---------------------- ---------------------- |");
-  messages.push_back(fmt::sprintf("%5d % .15e % .15e |\n", iter, delta, f));
+  messages.push_back(std::format("{5d} { .15e} { .15e} |\n", iter, delta, f));
 
   /* printf("%4d % .15e % .15e\n",i,delta,f); */
   while (fabs(f) > tolerance && i <= max_iterations) {
@@ -104,7 +105,7 @@ std::optional<double> OneSidedVinokur::solve(double delta, double L, size_t i, s
     delta -= f / fp;
     f = tanh(delta * C1) - C2 * tanh(delta);
     i++;
-    messages.push_back(fmt::sprintf("%5d % .15e % .15e |", iter, delta, f));
+    messages.push_back(std::format("{5d} { .15e} { .15e} |\n", iter, delta, f));
   }
   messages.push_back("----------------------------------------------------+");
   if (fabs(f) > tolerance) return {};

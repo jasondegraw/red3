@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2018 Jason W. DeGraw
+// Copyright (C) 2015-2022 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,16 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#ifdef __cpp_modules
-#ifdef _MSC_VER
-#define BOOST_UT_DISABLE_MODULE
-#include <boost/ut.hpp>
-#else
-import boost.ut; // Doesn't appear to work yet with MSVC/CMake
-#endif
-#else
-#include <boost/ut.hpp>
-#endif
+#include "ut-wrapper.hpp"
 
 #include "red3.hpp"
 #include "array.hpp"

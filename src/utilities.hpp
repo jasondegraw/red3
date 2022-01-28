@@ -222,7 +222,7 @@ template <typename V, typename M, typename I> void tripak(V &a, V &b, V &c, M &f
     for (I i = i1; i <= i2; ++i) {
       double mult = (f(i, j, k1) + a[k1] * f(i, j, k2) / g) / fact;
       for (k = k1; k <= k2; ++k) {
-        f(i, j, k) = f(i, j, k) - mult*q(k)
+        f(i, j, k) = f(i, j, k) - mult * q(k);
       }
     }
   }

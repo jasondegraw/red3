@@ -18,7 +18,7 @@ elseif(MSVC)
   if(${CMAKE_C_COMPILER_VERSION} VERSION_LESS "19.29.30040.0")
     message(FATAL_ERROR "Visual Studio earlier than VS2019 16.11 is not supported")
   endif()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest") # Switch to latest to get format, need to figure out what that means for the version
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   # Need to check for clang version
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -stdlib=libc++")
@@ -32,8 +32,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Eigen Dependency
 #include_directories(dependencies/eigen-eigen-5a0156e40feb/)
 # fmt
-add_subdirectory(dependencies/fmt-6.0.0)
-include_directories(dependencies/fmt-6.0.0/include)
+#add_subdirectory(dependencies/fmt-6.0.0)
+#include_directories(dependencies/fmt-6.0.0/include)
 
 add_subdirectory(src)
 #add_subdirectory(laminar-channel)

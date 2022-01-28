@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2019 Jason W. DeGraw
+// Copyright (C) 2015-2022 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -237,7 +237,7 @@ public:
 
   double m(index_t i) const
   {
-    return m_x[i];
+    return m_xm[i];
   }
 
   double delta(index_t i) const
@@ -264,7 +264,8 @@ public:
   const bool uniform;
 
 private:
-  Grid1D(std::vector<double> x, std::vector<double> xm, std::vector<double> dx, bool uniform) : uniform(false)
+  Grid1D(std::vector<double> x, std::vector<double> xm, std::vector<double> dx, bool uniform) : uniform(uniform),
+    m_x(x), m_xm(xm), m_dx(dx)
   {}
 
   std::vector<double> m_x;

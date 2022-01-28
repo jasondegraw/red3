@@ -13,55 +13,57 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include "ut-wrapper.hpp"
 
 #include "staggeredgrid.hpp"
 #include <iostream>
 #include <string>
 
-TEST_CASE("Basic 2D Staggered", "[StaggerdGrid]")
-{
-  red3::StaggeredGrid grid(red3::Grid1D(4), red3::Grid1D(5));
-  REQUIRE(4 == grid.ni);
-  REQUIRE(5 == grid.nu);
-  REQUIRE(5 == grid.nj);
-  REQUIRE(6 == grid.nv);
-  REQUIRE(1 == grid.nk);
-  REQUIRE(1 == grid.nw);
-  // Check grid
-  REQUIRE(5 == grid.x.size());
-  std::vector<double> x = { 0.0, 0.25, 0.5, 0.75, 1.0 };
-  for(auto i = 0; i < grid.nu; i++) {
-    INFO("Index: " << i);
-    REQUIRE(x[i] == grid.x[i]);
-  }
-  REQUIRE(4 == grid.x.midgrid().size());
-  std::vector<double> xm = { 0.125, 0.375, 0.625, 0.875 };
-  for(auto i = 0; i < grid.ni; i++) {
-    REQUIRE(xm[i] == grid.x.m(i));
-  }
-  REQUIRE(6 == grid.y.size());
-  std::vector<double> y = { 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 };
-  for(auto i = 0; i < grid.nv; i++) {
-    REQUIRE(y[i] == Approx(grid.y[i]));
-  }
-  REQUIRE(5 == grid.y.midgrid().size());
-  std::vector<double> ym = { 0.1, 0.3, 0.5, 0.7, 0.9 };
-  for(auto i = 0; i < grid.ni; i++) {
-    REQUIRE(ym[i] == Approx(grid.y.m(i)));
-  }
-  // Check velocity
-  grid.setU([](double x, double y){return x;});
-  grid.setV([](double x, double y){return -y;});
-  for(auto j = 0; j < grid.nj; j++) {
+boost::ut::suite staggered = [] {
+  using namespace boost::ut;
+
+  "basic 2d staggered grid"_test = [] {
+    red3::Grid1D xg(4);
+    red3::Grid1D yg(5);
+    red3::StaggeredGrid grid(xg, yg);
+    expect(eq(4, grid.ni) >> fatal);
+    expect(eq(5, grid.nu) >> fatal);
+    expect(eq(5, grid.nj) >> fatal);
+    expect(eq(6, grid.nv) >> fatal);
+    expect(eq(1, grid.nk) >> fatal);
+    expect(eq(1, grid.nw) >> fatal);
+    // Check grid
+    expect(eq(5, grid.x.size()) >> fatal);
+    std::vector<double> x = { 0.0, 0.25, 0.5, 0.75, 1.0 };
     for(auto i = 0; i < grid.nu; i++) {
-      REQUIRE(x[i] == grid.u(i, j, 0)); // << ("Index: (" + std::to_string(i) + "," + std::to_string(j) + ")");
+      expect(x[i] ==  grid.x[i]) << x[i] << " == " << grid.x[i] << ", i = " << i;
     }
-  }
+    expect(eq(4, grid.x.midgrid().size()) >> fatal);
+    std::vector<double> xm = { 0.125, 0.375, 0.625, 0.875 };
+    for(auto i = 0; i < grid.ni; i++) {
+      expect(xm[i] == grid.x.m(i)) << xm[i] << " == " << grid.x[i] << ", i = " << i;
+    }
+    expect(eq(6, grid.y.size()) >> fatal);
+    std::vector<double> y = { 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 };
+    for(auto i = 0; i < grid.nv; i++) {
+      expect(close(y[i], grid.y[i], 1.0e-15)) << y[i] << " == " << grid.y[i] << ", i = " << i;
+    }
+    expect(eq(5, grid.y.midgrid().size()) >> fatal);
+    std::vector<double> ym = { 0.1, 0.3, 0.5, 0.7, 0.9 };
+    for(auto i = 0; i < grid.ni; i++) {
+      expect(close(ym[i], grid.y.m(i), 1.0e-15)) << ym[i] << " == " << grid.y.m(i) << ", i = " << i;
+    }
+    // Check velocity
+    grid.setU([](double x, double y){return x;});
+    grid.setV([](double x, double y){return -y;});
+    for(auto j = 0; j < grid.nj; j++) {
+      for(auto i = 0; i < grid.nu; i++) {
+        expect(eq(x[i], grid.u(i, j, 0))) << "Index: (" << i << "," << j << ")";
+      }
+    }
   for(auto j = 0; j < grid.nv; j++) {
     for(auto i = 0; i < grid.ni; i++) {
-      REQUIRE(-y[j] == Approx(grid.v(i, j, 0))); // << ("Index: (" + std::to_string(i) + "," + std::to_string(j) + ")");
+      expect(close(-y[j], grid.v(i, j, 0), 1.0e-15)) << "Index: (" << i << "," << j << ")";
     }
   }
   // Divergence, etc.
@@ -70,28 +72,28 @@ TEST_CASE("Basic 2D Staggered", "[StaggerdGrid]")
   grid.dudx(g);
   for(auto j = 0; j < grid.nj; j++) {
     for(auto i = 0; i < grid.ni; i++){
-      REQUIRE(1.0 == g(i, j, 0));
+      expect(1.0_d == g(i, j, 0));
     }
   }
   grid.dvdy(g);
   for(auto j = 0; j < grid.nj; j++) {
     for(auto i = 0; i < grid.ni; i++){
-      REQUIRE(-1.0 == g(i, j, 0));
+      expect(-1.0_d == g(i, j, 0));
     }
   }
   grid.divg(g);
   for(auto j = 0; j < grid.nj; j++) {
     for(auto i = 0; i < grid.ni; i++){
-      REQUIRE(0.0 == g(i, j, 0));
+      expect(0.0_d == g(i, j, 0));
     }
   }
   // BC Setters
   grid.setNorthU([](double x){return -x;});
   for(auto i = 0; i < grid.nu; i++) {
-    REQUIRE(-x[i] == grid.northU(i, 0)); // << ("Index: " + std::to_string(i));
+    expect(eq(-x[i], grid.northU(i, 0))); // << ("Index: " + std::to_string(i));
   }
 
-  auto us = grid.uArray();
-
-}
+  //auto us = grid.uArray();
+  };
+};
 
