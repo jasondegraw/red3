@@ -49,13 +49,25 @@ public:
     return true;
   }
 
-  virtual double delta(double i) const = 0;
+  virtual double delta(double i) const
+  {
+    return 1.0;
+  }
 
-  virtual std::vector<double> grid() = 0;
+  virtual std::vector<double> grid()
+  {
+    return { -0.5, 0.5 };
+  }
 
-  virtual std::vector<double> midgrid() = 0;
+  virtual std::vector<double> midgrid()
+  {
+    return { 0.0 };
+  }
 
-  virtual std::vector<double> delta() = 0;
+  virtual std::vector<double> delta()
+  {
+    return { 1.0 };
+  }
 
   //double operator[](index_t i) const
   //{

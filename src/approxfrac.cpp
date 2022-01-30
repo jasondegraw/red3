@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2019 Jason W. DeGraw
+// Copyright (C) 2015-2022 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@ ViscousOperatorU::ViscousOperatorU(StaggeredGrid *parent, double dt, double Re) 
   m_ax.resize(parent->nu-2);
   m_bx.resize(parent->nu-2);
   m_cx.resize(parent->nu-2);
-  if (parent->x.uniform) {
-    double dx = parent->x.delta0();
+  if (parent->uniform_x) {
+    double dx = parent->dx[0];
     double rdx2 = mul / (dx*dx);
     for (index_t i = 0; i < parent->nu-2; ++i) {
       m_ax[i] = m_cx[i] = -rdx2;
@@ -43,8 +43,8 @@ ViscousOperatorU::ViscousOperatorU(StaggeredGrid *parent, double dt, double Re) 
   m_ay.resize(parent->nj);
   m_by.resize(parent->nj);
   m_cy.resize(parent->nj);
-  if (parent->y.uniform) {
-    double dy = parent->y.delta0();
+  if (parent->uniform_y) {
+    double dy = parent->dy[0];
     double rdy2 = mul / (dy*dy);
     for (index_t i = 0; i < parent->nj; ++i) {
       m_ay[i] = m_cy[i] = -rdy2;
@@ -72,8 +72,8 @@ ViscousOperatorV::ViscousOperatorV(StaggeredGrid *parent, double dt, double Re) 
   m_ax.resize(parent->ni);
   m_bx.resize(parent->ni);
   m_cx.resize(parent->ni);
-  if (parent->x.uniform) {
-    double dx = parent->x.delta0();
+  if (parent->uniform_x) {
+    double dx = parent->dx[0];
     double rdx2 = mul / (dx*dx);
     for (index_t i = 0; i < parent->ni; ++i) {
       m_ax[i] = m_cx[i] = -rdx2;
@@ -86,8 +86,8 @@ ViscousOperatorV::ViscousOperatorV(StaggeredGrid *parent, double dt, double Re) 
   m_ay.resize(parent->nj);
   m_by.resize(parent->nj);
   m_cy.resize(parent->nj);
-  if (parent->y.uniform) {
-    double dy = parent->y.delta0();
+  if (parent->uniform_y) {
+    double dy = parent->dy[0];
     double rdy2 = mul / (dy*dy);
     for (index_t i = 0; i < parent->nj; ++i) {
       m_ay[i] = m_cy[i] = -rdy2;
@@ -155,9 +155,9 @@ void IsothermalFlow::convec(ArrayM &h1, ArrayM &h2, ArrayM &h3, index_t i1, inde
       index_t jm1 = j - 1;
       index_t jp1 = j + 1;
       double cy = 0.5 / (y[j] - y[jm1]);
-      double cym = 0.25 / (y.m(jp1) - y.m(j));
-      double cyn = (y[j] - y.m(j)) / (y.m(jp1) - y.m(j));
-      double cys = (y[jm1] - y.m(jm1)) / (y.m(j) - y.m(jm1));
+      double cym = 0.25 / (ym[jp1] - ym[j]);
+      double cyn = (y[j] - ym[j]) / (ym[jp1] - ym[j]);
+      double cys = (y[jm1] - ym[jm1]) / (ym[j] - ym[jm1]);
       for (index_t i = i1; i <= i2; ++i) {
         //do i = i1, i2          !2, imax
         index_t im1 = i - 1;
@@ -203,9 +203,9 @@ void IsothermalFlow::convec(ArrayM &h1, ArrayM &h2, ArrayM &h3, index_t i1, inde
         index_t jm1 = j - 1;
         index_t jp1 = j + 1;
         double cy = 0.5 / (y[j] - y[j - 1]);
-        double cym = 0.25 / (y.m(jp1) - y.m(j));
-        double cyn = (y[j] - y.m(j)) / (y.m(jp1) - y.m(j));
-        double cys = (y[jm1] - y.m(jm1)) / (y.m(j) - y.m(jm1));
+        double cym = 0.25 / (ym[jp1] - ym[j]);
+        double cyn = (y[j] - ym[j]) / (ym[jp1] - ym[j]);
+        double cys = (y[jm1] - ym[jm1]) / (ym[j] - ym[jm1]);
         for (index_t i = i1; i <= i2; ++i) {
           //do i = i1, i2       !2, imax
           index_t im1 = i - 1;

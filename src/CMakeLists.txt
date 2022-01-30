@@ -6,7 +6,7 @@ project(lib)
 #include_directories(../dependencies/jsoncpp) 
 
 set(SRCS #
-         #approxfrac.cpp
+         approxfrac.cpp
          grid.cpp
          #util.cpp
          staggeredgrid.cpp
@@ -16,7 +16,7 @@ set(SRCS #
 )
 
 set(HDRS red3api.hpp
-         #approxfrac.hpp
+         approxfrac.hpp
          array.hpp
          arrayops.hpp
          #def.hpp

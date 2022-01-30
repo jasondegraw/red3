@@ -41,17 +41,17 @@ public:
 
   //using index_t = int;
 
-  StaggeredGrid(Grid1D& x, Grid1D& y, bool xperi = false);
-  StaggeredGrid(Grid1D& x, Grid1D& y, Grid1D& z, bool xperi = false);
+  StaggeredGrid(Generator1D& gx, Generator1D& gy, bool xperi = false);
+  StaggeredGrid(Generator1D& gx, Generator1D& gy, Generator1D& gz, bool xperi = false);
 
   virtual ~StaggeredGrid()
   {}
 
-  double northU(int i, int k) { return m_u_n[IKINDEX(i, k, nu, nk)]; }
-  double southU(int i, int k) { return m_u_s[IKINDEX(i, k, nu, nk)]; }
+  double north_u(int i, int k) { return m_u_n[IKINDEX(i, k, nu, nk)]; }
+  double south_u(int i, int k) { return m_u_s[IKINDEX(i, k, nu, nk)]; }
 
-  double eastU(int j, int k) { return u[UINDEX(ni, j, k, nu, nj, nk)]; }
-  double westU(int j, int k) { return u[UINDEX(0, j, k, nu, nj, nk)]; }
+  double east_u(int j, int k) { return u[UINDEX(ni, j, k, nu, nj, nk)]; }
+  double west_u(int j, int k) { return u[UINDEX(0, j, k, nu, nj, nk)]; }
 
   //template <typename M> void divg(M &g)
   //{
@@ -221,11 +221,11 @@ public:
     }
   }
 
-  void setU(double(*f)(double x, double y))
+  void set_u(double(*f)(double x, double y))
   {
     for (int k = 0; k < nk; k++) {
       for (int j = 0; j < nj; j++) {
-        double yy = y.m(j);
+        double yy = ym[j];
         for (int i = 0; i < nu; i++) {
           u[UINDEX(i, j, k, nu, nj, nk)] = f(x[i], yy);
         }
@@ -233,11 +233,11 @@ public:
     }
   }
 
-  void setV(double(*f)(double x, double y))
+  void set_v(double(*f)(double x, double y))
   {
     for (int k = 0; k < nk; k++) {
       for (int i = 0; i < ni; i++) {
-        double xx = x.m(i);
+        double xx = xm[i];
         for (int j = 0; j < nv; j++) {
           v[VINDEX(i, j, k, ni, nv, nk)] = f(xx, y[j]);
         }
@@ -245,7 +245,7 @@ public:
     }
   }
 
-  void setU(double(*f)(double x, double y, double z))
+  void set_u(double(*f)(double x, double y, double z))
   {
     if (nk > 1) {
       for (int k = 0; k < nk; k++) {
@@ -268,36 +268,36 @@ public:
     }
   }
 
-  void setV(double(*f)(double x, double y, double z))
+  void set_v(double(*f)(double x, double y, double z))
   {
 
   }
 
-  void setW(double(*f)(double x, double y, double z))
+  void set_w(double(*f)(double x, double y, double z))
   {
 
   }
 
-  void setEastU(double(*f)(double y))
+  void set_east_u(double(*f)(double y))
   {
     for (int k = 0; k < nk; k++) {
       for (int j = 0; j < nj; j++) {
         //std::cout << 0 << ' ' << j << ' ' << k << ' ' << INDEX(0, j, k, nu, nj, nk) << ' ' << f(ym[j]) << std::endl;
-        u[INDEX(ni, j, k, nu, nj, nk)] = f(y.m(j));
+        u[INDEX(ni, j, k, nu, nj, nk)] = f(ym[j]);
       }
     }
   }
 
-  void setWestU(double(*f)(double y))
+  void set_west_u(double(*f)(double y))
   {
     for (int k = 0; k < nk; k++) {
       for (int j = 0; j < nj; j++) {
-        u[INDEX(0, j, k, nu, nj, nk)] = f(y.m(j));
+        u[INDEX(0, j, k, nu, nj, nk)] = f(ym[j]);
       }
     }
   }
 
-  void setNorthU(double(*f)(double x))
+  void set_north_u(double(*f)(double x))
   {
     for (int k = 0; k < nk; k++) {
       for (int i = 0; i < nu; i++) {
@@ -306,7 +306,7 @@ public:
     }
   }
 
-  void setSouthU(double(*f)(double x))
+  void set_south_u(double(*f)(double x))
   {
     for (int k = 0; k < nk; k++) {
       for (int i = 0; i < nu; i++) {
@@ -315,27 +315,38 @@ public:
     }
   }
 
-  ArrayM maxArray() {
+  ArrayM max_array() {
     return ArrayM(static_cast<StaggeredGrid*>(this));
   }
 
-  ArrayP pArray() {
+  ArrayP p_array() {
     return ArrayP(static_cast<StaggeredGrid*>(this));
   }
 
-  ArrayU uArray() {
+  ArrayU u_array() {
     return ArrayU(static_cast<StaggeredGrid*>(this));
   }
 
-  ArrayV vArray() {
+  ArrayV v_array() {
     return ArrayV(static_cast<StaggeredGrid*>(this));
   }
 
-  ArrayW wArray() {
+  ArrayW w_array() {
     return ArrayW(static_cast<StaggeredGrid*>(this));
   }
 
   void divg(double *g);
+
+  // The grid
+  const std::vector<double> x;
+  const std::vector<double> y;
+  const std::vector<double> z;
+  const std::vector<double> xm;
+  const std::vector<double> ym;
+  const std::vector<double> zm;
+  const std::vector<double> dx;
+  const std::vector<double> dy;
+  const std::vector<double> dz;
 
   const index_t ni;
   const index_t nj;
@@ -352,10 +363,9 @@ public:
 
   const bool xperi;
   const bool two_dimensional;
-
-  const Grid1D x;
-  const Grid1D y;
-  const Grid1D z;
+  const bool uniform_x;
+  const bool uniform_y;
+  const bool uniform_z;
 
   //std::vector<double> x;
   //std::vector<double> dx;

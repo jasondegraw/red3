@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2019 Jason W. DeGraw
+// Copyright (C) 2015-2022 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 #include "array.hpp"
 #include <functional>
 #include "red3api.hpp"
-//#include <Eigen/Sparse>
 
 namespace red3 {
 namespace approxfrac {
@@ -95,7 +94,16 @@ class RED3_API IsothermalFlow : public StaggeredGrid
 public:
   enum class BoundaryCondition {  };
   enum class Differencing {  };
-  IsothermalFlow(double reynum, double dt, Grid1D& x, Grid1D& y, Grid1D& z=Grid1D::one(), bool xperi = false)
+
+  IsothermalFlow(double reynum, double dt, Generator1D& x, Generator1D& y, bool xperi = false)
+    : StaggeredGrid(x, y, xperi),
+    g(this), //aw(this), an(this), as(this), af(this), ab(this), b(this), 
+    reynum(reynum), dt(dt)
+  {
+
+  }
+
+  IsothermalFlow(double reynum, double dt, Generator1D& x, Generator1D& y, Generator1D& z, bool xperi = false)
     : StaggeredGrid(x, y, z, xperi),
     g(this), //aw(this), an(this), as(this), af(this), ab(this), b(this), 
     reynum(reynum), dt(dt)
@@ -103,7 +111,7 @@ public:
 
   }
 
-  void initialize()
+  void initialize();
 
 
   void setupU();

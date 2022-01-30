@@ -40,7 +40,9 @@ public:
   {
     m_impl = other.m_impl;
     m_parent = other.m_parent;
-    return *this;
+    //return *this;
+    // approxfac is triggering the need for the cast on ChildArrayW, which is strange. Why not on u or v?
+    return (U&)(*this);
   }
 
   bool operator==(const U &other) const

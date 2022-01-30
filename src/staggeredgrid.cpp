@@ -22,41 +22,47 @@
 namespace red3
 {
 
-  StaggeredGrid::StaggeredGrid(Grid1D& x, Grid1D& y, bool xperi)
-    : ni(x.size()-1), nj(y.size()-1), nk(1), nu(ni + 1), nv(nj + 1), nw(1), xperi(xperi),
-    two_dimensional(true), x(x), y(y), z(Grid1D::one()), nnu(nu* nj* nk), nnv(ni* nv* nk), nnw(ni* nj* nw), ncells(ni* nj* nk), bfx(0.0), bfy(0.0), bfz(0.0)
+  StaggeredGrid::StaggeredGrid(Generator1D& gx, Generator1D& gy, bool xperi)
+    : x(gx.grid()), y(gy.grid()), z({-0.5, 0.5}), xm(gx.midgrid()), ym(gy.midgrid()), zm({0.0}),
+    dx(gx.delta()), dy(gy.delta()), dz({ 1.0 }), ni(xm.size()), nj(ym.size()), nk(1),
+    nu(ni + 1), nv(nj + 1), nw(1), xperi(xperi), two_dimensional(true),
+    uniform_x(gx.uniform()), uniform_y(gy.uniform()), uniform_z(true),
+    nnu(nu* nj* nk), nnv(ni* nv* nk), nnw(ni* nj* nw), ncells(ni* nj* nk), bfx(0.0), bfy(0.0), bfz(0.0)
   {
-    u = uArray();
-    v = vArray();
-    p = pArray();
+    u = u_array();
+    v = v_array();
+    p = p_array();
 
     m_u_n = (double*)callocate(ni * nk, sizeof(double), "north u velocity");
     m_u_s = (double*)callocate(ni * nk, sizeof(double), "south u velocity");
   }
 
-  StaggeredGrid::StaggeredGrid(Grid1D& x, Grid1D& y, Grid1D& z, bool xperi)
-    : ni(x.size()-1), nj(y.size()-1), nk(z.size()), nu(ni + 1), nv(nj + 1), nw(nk == 1 ? 1 : nk + 1), xperi(xperi),
-    two_dimensional(false), x(x), y(y), z(z), nnu(nu*nj*nk), nnv(ni*nv*nk), nnw(ni*nj*nw), ncells(ni*nj*nk), bfx(0.0), bfy(0.0), bfz(0.0)
+  StaggeredGrid::StaggeredGrid(Generator1D& gx, Generator1D& gy, Generator1D& gz, bool xperi)
+    : x(gx.grid()), y(gy.grid()), z(gz.grid()), xm(gx.midgrid()), ym(gy.midgrid()), zm(gz.midgrid()),
+    dx(gx.delta()), dy(gy.delta()), dz(gz.delta()), ni(xm.size()), nj(ym.size()), nk(zm.size()),
+    nu(ni + 1), nv(nj + 1), nw(nw+1), xperi(xperi), two_dimensional(dz.size() == 1),
+    uniform_x(gx.uniform()), uniform_y(gy.uniform()), uniform_z(gz.uniform()),
+    nnu(nu* nj* nk), nnv(ni* nv* nk), nnw(ni* nj* nw), ncells(ni* nj* nk), bfx(0.0), bfy(0.0), bfz(0.0)
   {
 
     auto nuvw = ni + nj + 2;
     if (nk > 1) {
-      w = wArray();
+      w = w_array();
     }
-    u = uArray();
-    v = vArray();
-    p = pArray();
+    u = u_array();
+    v = v_array();
+    p = p_array();
 
     m_u_n = (double*)callocate(ni*nk, sizeof(double), "north u velocity");
     m_u_s = (double*)callocate(ni*nk, sizeof(double), "south u velocity");
 
     // Assume a simple grid
-    double rdx = 1.0 / x.delta0();
+    double rdx = 1.0 / dx[0];
     //m_rdx = std::vector<double>(xg.n(), rdx);
-    double rdy = 1.0 / y.delta0();
+    double rdy = 1.0 / dy[0];
     //m_rdy = std::vector<double>(yg.n(), rdy);
     if (nk > 1) {
-      double rdz = 1.0 / z.delta0();
+      double rdz = 1.0 / dz[0];
       //m_rdz = std::vector<double>(zg.n(), rdz);
     } //else {
       //z = { -0.5, 0.5 };
