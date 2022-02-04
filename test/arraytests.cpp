@@ -24,7 +24,7 @@ import boost.ut; // Doesn't appear to work yet with MSVC/CMake
 #include <boost/ut.hpp>
 #endif
 
-#include "red3/red3.hpp"
+#include "red3/defs.hpp"
 #include "red3/array.hpp"
 
 struct ArrayParentU

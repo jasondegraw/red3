@@ -11,11 +11,10 @@ set(SRCS #
          #util.cpp
          staggeredgrid.cpp
          #upwind.cpp
-         util.cpp
          utilities.cpp
 )
 
-set(HDRS ../include/red3/red3.hpp
+set(HDRS ../include/red3/defs.hpp
          ../include/red3/approxfrac.hpp
          ../include/red3/array.hpp
          ../include/red3/arrayops.hpp
@@ -24,8 +23,7 @@ set(HDRS ../include/red3/red3.hpp
          #red3.hpp
          ../include/red3/staggeredgrid.hpp
          #upwind.hpp
-         util.hpp
-         utilities.hpp
+         ../include/red3/utilities.hpp
 )
 
 add_library(red3_core SHARED ${HDRS} ${SRCS} ${DEP_SRCS})

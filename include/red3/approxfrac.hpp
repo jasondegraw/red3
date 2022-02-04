@@ -15,10 +15,9 @@
 //
 #ifndef RED3_APPROXFRAC_HPP
 #define RED3_APPROXFRAC_HPP
-#include "staggeredgrid.hpp"
-#include "array.hpp"
+#include "red3/staggeredgrid.hpp"
+#include "red3/array.hpp"
 #include <functional>
-#include "api.hpp"
 
 namespace red3 {
 namespace approxfrac {

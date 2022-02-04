@@ -16,7 +16,7 @@
 #ifndef RED3_UTILITIES_HPP
 #define RED3_UTILITIES_HPP
 
-#include "red3/red3.hpp"
+#include "red3/defs.hpp"
 #include <string>
 
 namespace red3 {

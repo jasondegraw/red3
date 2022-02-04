@@ -20,7 +20,7 @@
 #include <algorithm>
 #include <memory>
 
-#include "red3/red3.hpp"
+#include "red3/defs.hpp"
 #include "red3/array.hpp"
 #include "red3/utilities.hpp"
 #include "red3/grid.hpp"

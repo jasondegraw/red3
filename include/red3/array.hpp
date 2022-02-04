@@ -16,8 +16,8 @@
 #ifndef RED3_ARRAY_HPP
 #define RED3_ARRAY_HPP
 #include <memory>
-#include "red3.hpp"
-#include "arrayops.hpp"
+#include "red3/defs.hpp"
+#include "red3/arrayops.hpp"
 
 namespace red3 {
 
