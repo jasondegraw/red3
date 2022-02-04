@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(laminar-channel)
 
-include_directories(../src)
+include_directories(../include)
 
-add_executable(laminar-channel geom.cpp)
-target_link_libraries(laminar-channel red3_core)
+add_executable("entrance-length" "entrance-length.cpp")
+target_link_libraries("entrance-length" red3_core)
 

@@ -18,7 +18,7 @@
 #include "staggeredgrid.hpp"
 #include "array.hpp"
 #include <functional>
-#include "red3api.hpp"
+#include "api.hpp"
 
 namespace red3 {
 namespace approxfrac {

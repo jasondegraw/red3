@@ -19,18 +19,5 @@
 
 namespace red3 {
 
-void fatal(const std::string &mesg)
-{
-  throw std::runtime_error("red3: " + mesg);
-}
-
-void* callocate(size_t num, size_t size, const std::string &name)
-{
-  void* v = calloc(num, size);
-  if(v == 0) {
-    fatal("Failed to allocate " + name);
-  }
-  return v;
-}
 
 }

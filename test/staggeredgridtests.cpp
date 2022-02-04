@@ -24,7 +24,7 @@ import boost.ut; // Doesn't appear to work yet with MSVC/CMake
 #include <boost/ut.hpp>
 #endif
 
-#include "staggeredgrid.hpp"
+#include "red3/staggeredgrid.hpp"
 #include <iostream>
 #include <string>
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2019 Jason W. DeGraw
+// Copyright (C) 2015-2022 Jason W. DeGraw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,6 +15,9 @@
 //
 #ifndef RED3_UTILITIES_HPP
 #define RED3_UTILITIES_HPP
+
+#include "red3/red3.hpp"
+#include <string>
 
 namespace red3 {
 
@@ -227,6 +230,9 @@ template <typename V, typename M, typename I> void tripak(V &a, V &b, V &c, M &f
     }
   }
 }
+
+void RED3_API fatal(const std::string& mesg);
+RED3_API void* callocate(size_t num, size_t size, const std::string& name);
 
 }
 

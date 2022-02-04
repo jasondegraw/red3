@@ -24,7 +24,7 @@ import boost.ut; // Doesn't appear to work yet with MSVC/CMake
 #include <boost/ut.hpp>
 #endif
 
-#include "grid.hpp"
+#include "red3/grid.hpp"
 
 boost::ut::suite grids = [] {
   using namespace boost::ut;

@@ -13,11 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include "util.hpp"
-#include "approxfrac.hpp"
-#include "grid.hpp"
-#include "arrayops.hpp"
-#include "utilities.hpp"
+#include "red3/approxfrac.hpp"
+#include "red3/grid.hpp"
+#include "red3/arrayops.hpp"
+#include "red3/utilities.hpp"
 #include <iostream>
 
 namespace red3 {

@@ -16,7 +16,7 @@
 #ifndef RED3_GRID_HPP
 #define RED3_GRID_HPP
 
-#include "red3.hpp"
+#include "red3/red3.hpp"
 #include <vector>
 #include <memory>
 #include <string>

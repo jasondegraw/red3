@@ -13,10 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include "util.hpp"
-#include "staggeredgrid.hpp"
-#include "grid.hpp"
-#include "arrayops.hpp"
+#include "red3/utilities.hpp"
+#include "red3/staggeredgrid.hpp"
+#include "red3/grid.hpp"
+#include "red3/arrayops.hpp"
 #include <iostream>
 
 namespace red3

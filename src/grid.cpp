@@ -13,10 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include"grid.hpp"
+#include "red3/grid.hpp"
 #include <algorithm>
 #include <format>
-//#include "fmt/printf.h"
 
 namespace red3 {
 

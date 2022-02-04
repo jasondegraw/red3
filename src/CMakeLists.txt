@@ -15,14 +15,14 @@ set(SRCS #
          utilities.cpp
 )
 
-set(HDRS red3api.hpp
-         approxfrac.hpp
-         array.hpp
-         arrayops.hpp
+set(HDRS ../include/red3/red3.hpp
+         ../include/red3/approxfrac.hpp
+         ../include/red3/array.hpp
+         ../include/red3/arrayops.hpp
          #def.hpp
-         grid.hpp
+         ../include/red3/grid.hpp
          #red3.hpp
-         staggeredgrid.hpp
+         ../include/red3/staggeredgrid.hpp
          #upwind.hpp
          util.hpp
          utilities.hpp

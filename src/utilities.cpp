@@ -13,7 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-#include "utilities.hpp"
+#include "red3/utilities.hpp"
+#include <stdexcept>
+#include <stdlib.h>
 
 namespace red3 {
 
@@ -35,6 +37,20 @@ template <> double power<1>(double v)
 template <> double power<0>(double v)
 {
   return 1.0;
+}
+
+void fatal(const std::string& mesg)
+{
+  throw std::runtime_error("red3: " + mesg);
+}
+
+void* callocate(size_t num, size_t size, const std::string& name)
+{
+  void* v = calloc(num, size);
+  if (v == 0) {
+    fatal("Failed to allocate " + name);
+  }
+  return v;
 }
 
 }

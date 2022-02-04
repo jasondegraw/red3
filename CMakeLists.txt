@@ -35,6 +35,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 #add_subdirectory(dependencies/fmt-6.0.0)
 #include_directories(dependencies/fmt-6.0.0/include)
 
+include_directories(include)
+
 add_subdirectory(src)
 add_subdirectory(laminar-channel)
 #add_subdirectory(simple2d)
