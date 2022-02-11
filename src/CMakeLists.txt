@@ -8,7 +8,6 @@ project(lib)
 set(SRCS #
          approxfrac.cpp
          grid.cpp
-         #util.cpp
          staggeredgrid.cpp
          #upwind.cpp
          utilities.cpp
@@ -18,11 +17,9 @@ set(HDRS ../include/red3/defs.hpp
          ../include/red3/approxfrac.hpp
          ../include/red3/array.hpp
          ../include/red3/arrayops.hpp
-         #def.hpp
          ../include/red3/grid.hpp
-         #red3.hpp
          ../include/red3/staggeredgrid.hpp
-         #upwind.hpp
+         #../include/red3/upwind.hpp
          ../include/red3/utilities.hpp
 )
 
