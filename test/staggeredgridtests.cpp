@@ -55,12 +55,12 @@ boost::ut::suite staggered = [] {
     expect(eq(6, grid.y.size()) >> fatal);
     std::vector<double> y = { 0.0, 0.2, 0.4, 0.6, 0.8, 1.0 };
     for(auto i = 0; i < grid.nv; i++) {
-      expect(close(y[i], grid.y[i], 1.0e-15)) << y[i] << " == " << grid.y[i] << ", i = " << i;
+      expect(near(y[i], grid.y[i], 1.0e-15)) << y[i] << " == " << grid.y[i] << ", i = " << i;
     }
     expect(eq(5, grid.ym.size()) >> fatal);
     std::vector<double> ym = { 0.1, 0.3, 0.5, 0.7, 0.9 };
     for(auto i = 0; i < grid.ni; i++) {
-      expect(close(ym[i], grid.ym[i], 1.0e-15)) << ym[i] << " == " << grid.ym[i] << ", i = " << i;
+      expect(near(ym[i], grid.ym[i], 1.0e-15)) << ym[i] << " == " << grid.ym[i] << ", i = " << i;
     }
     // Check velocity
     grid.set_u([](double x, double y){return x;});
@@ -72,7 +72,7 @@ boost::ut::suite staggered = [] {
     }
   for(auto j = 0; j < grid.nv; j++) {
     for(auto i = 0; i < grid.ni; i++) {
-      expect(close(-y[j], grid.v(i, j, 0), 1.0e-15)) << "Index: (" << i << "," << j << ")";
+      expect(near(-y[j], grid.v(i, j, 0), 1.0e-15)) << "Index: (" << i << "," << j << ")";
     }
   }
   // Divergence, etc.

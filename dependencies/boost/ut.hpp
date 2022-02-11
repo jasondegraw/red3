@@ -803,8 +803,8 @@ struct le_ : op {
 };
 
 template <class TLhs, class TRhs, class TEps>
-struct close_ : op {
-  constexpr close_(const TLhs& lhs = {}, const TRhs& rhs = {}, const TEps& eps = {})
+struct near_ : op {
+  constexpr near_(const TLhs& lhs = {}, const TRhs& rhs = {}, const TEps& eps = {})
       : lhs_{lhs}, rhs_{rhs}, eps_{eps}, value_{[&] {
           using std::operator==;
           using std::operator<;
@@ -2215,8 +2215,8 @@ template <class TLhs, class TRhs>
   return detail::le_{lhs, rhs};
 }
 template <class TLhs, class TRhs, class TEps>
-[[nodiscard]] constexpr auto close(const TLhs& lhs, const TRhs& rhs, const TEps& eps) {
-  return detail::close_{ lhs, rhs, eps };
+[[nodiscard]] constexpr auto near(const TLhs& lhs, const TRhs& rhs, const TEps& eps) {
+  return detail::near_{ lhs, rhs, eps };
 }
 
 template <class T>
